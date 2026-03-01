@@ -1,0 +1,60 @@
+{
+  "file_types": {
+    "TcPOU": {
+      "function_block": {
+        "prefix": "FB_",
+        "pattern": "^FB_[A-Z][a-zA-Z0-9_]*$",
+        "examples": ["FB_Controller", "FB_MotionAxis"],
+        "description": "Function blocks should start with FB_ followed by PascalCase"
+      },
+      "program": {
+        "prefix": "PRG_",
+        "pattern": "^PRG_[A-Z][a-zA-Z0-9_]*$",
+        "examples": ["PRG_Main", "PRG_Cyclic"],
+        "description": "Programs should start with PRG_ followed by PascalCase"
+      },
+      "function": {
+        "prefix": "FUNC_",
+        "pattern": "^FUNC_[A-Z][a-zA-Z0-9_]*$",
+        "examples": ["FUNC_Calculate"],
+        "description": "Functions should start with FUNC_ followed by PascalCase"
+      }
+    },
+    "TcIO": {
+      "interface": {
+        "prefix": "I_",
+        "pattern": "^I_[A-Z][a-zA-Z0-9_]*$",
+        "examples": ["I_Publisher", "I_Device"],
+        "description": "Interfaces should start with I_ followed by PascalCase"
+      }
+    },
+    "TcDUT": {
+      "structure": {
+        "prefix": "ST_",
+        "pattern": "^ST_[A-Z][a-zA-Z0-9_]*$",
+        "examples": ["ST_Config", "ST_Status"],
+        "description": "Structures should start with ST_ followed by PascalCase"
+      },
+      "enum": {
+        "prefix": "E_",
+        "pattern": "^E_[A-Z][a-zA-Z0-9_]*$",
+        "examples": ["E_State", "E_ErrorCode"],
+        "description": "Enums should start with E_ followed by PascalCase"
+      },
+      "type_alias": {
+        "prefix": "T_",
+        "pattern": "^T_[A-Z][a-zA-Z0-9_]*$",
+        "examples": ["T_Position"],
+        "description": "Type aliases should start with T_ followed by PascalCase"
+      }
+    },
+    "TcGVL": {
+      "global_variable_list": {
+        "prefix": "GVL_",
+        "pattern": "^GVL_[A-Z][a-zA-Z0-9_]*$",
+        "examples": ["GVL_Constants", "GVL_TerminalConstants", "GVL_Mapping"],
+        "description": "Global variable lists should start with GVL_ followed by PascalCase"
+      }
+    }
+  }
+}

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_Controller" Id="{a1b2c3d4-e5f6-7890-abcd-ef1234567890}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Controller
+VAR_INPUT
+  bEnable : BOOL;
+  nSetpoint : INT;
+END_VAR
+VAR_OUTPUT
+  bActive : BOOL;
+END_VAR
+VAR
+  nInternal : INT;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[bActive := bEnable;
+nInternal := nSetpoint;]]></ST>
+    </Implementation>
+    <LineIds Name="FB_Controller">
+      <LineId Id="1" Count="1" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FUNC_Bad" Id="{d1e2f3a4-b5c6-7890-abcd-ef1234567893}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION FUNC_Bad : BOOL
+VAR_INPUT
+  nInput : INT;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[FUNC_Bad := nInput > 0;]]></ST>
+    </Implementation>
+    <Method Name="M_Helper" Id="{e1f2a3b4-c5d6-7890-abcd-ef1234567894}">
+      <Declaration><![CDATA[METHOD M_Helper : BOOL]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[M_Helper := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FUNC_Bad">
+      <LineId Id="3" Count="0" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FUNC_Bad.M_Helper">
+      <LineId Id="3" Count="0" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

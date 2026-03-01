@@ -1,0 +1,186 @@
+{
+  "version": "1.0.0",
+  "description": "Deterministic generation contracts for TwinCAT 3 XML file types.",
+  "file_types": {
+    ".TcPOU": {
+      "scope": "TwinCAT POU XML (FUNCTION_BLOCK, FUNCTION, PROGRAM)",
+      "required_elements": [
+        "TcPlcObject",
+        "POU",
+        "Declaration",
+        "Implementation",
+        "ST",
+        "LineIds"
+      ],
+      "required_attributes": {
+        "TcPlcObject": [
+          "Version",
+          "ProductVersion"
+        ],
+        "POU": [
+          "Name",
+          "Id",
+          "SpecialFunc"
+        ],
+        "LineIds": [
+          "Name"
+        ]
+      },
+      "forbidden_patterns": [
+        "<POU without Name/Id attributes>",
+        "<Object><Type>POU</Type>",
+        "<Declaration without CDATA>",
+        "<Implementation missing ST CDATA>",
+        "VAR PROTECTED...END_VAR (server policy: not a valid TwinCAT POU variable block)",
+        "VAR_PROTECTED...END_VAR (server policy: underscore form is equally forbidden)"
+      ],
+      "generation_rules": [
+        "Use XML declaration with utf-8 encoding.",
+        "POU Id must be lowercase GUID format {xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}.",
+        "Declaration CDATA must begin with FUNCTION_BLOCK, FUNCTION, or PROGRAM and match POU Name.",
+        "Implementation must contain ST CDATA block, even if empty.",
+        "Include LineIds for main body and close file with final newline.",
+        "NEVER use 'VAR PROTECTED' or 'VAR_PROTECTED' variable blocks. Express encapsulation via METHOD/PROPERTY with PROTECTED access specifier instead (e.g. METHOD PROTECTED M_Name).",
+        "Valid POU variable block keywords: VAR, VAR_INPUT, VAR_OUTPUT, VAR_IN_OUT, VAR_GLOBAL, VAR CONSTANT, VAR RETAIN, VAR PERSISTENT."
+      ],
+      "minimal_skeleton": [
+        "<?xml version=\"1.0\" encoding=\"utf-8\"?>",
+        "<TcPlcObject Version=\"1.1.0.1\" ProductVersion=\"3.1.4024.12\">",
+        "  <POU Name=\"FB_Example\" Id=\"{12345678-1234-1234-1234-123456789abc}\" SpecialFunc=\"None\">",
+        "    <Declaration><![CDATA[FUNCTION_BLOCK FB_Example",
+        "VAR_INPUT",
+        "  bEnable : BOOL;",
+        "END_VAR]]></Declaration>",
+        "    <Implementation>",
+        "      <ST><![CDATA[]]></ST>",
+        "    </Implementation>",
+        "    <LineIds Name=\"FB_Example\">",
+        "      <LineId Id=\"1\" Count=\"0\" />",
+        "    </LineIds>",
+        "  </POU>",
+        "</TcPlcObject>"
+      ]
+    },
+    ".TcDUT": {
+      "scope": "TwinCAT DUT XML (TYPE definitions)",
+      "required_elements": [
+        "TcPlcObject",
+        "DUT",
+        "Declaration"
+      ],
+      "required_attributes": {
+        "TcPlcObject": [
+          "Version",
+          "ProductVersion"
+        ],
+        "DUT": [
+          "Name",
+          "Id"
+        ]
+      },
+      "forbidden_patterns": [
+        "<DUT without Name/Id attributes>",
+        "<Declaration without TYPE ... END_TYPE>",
+        "<Implementation>"
+      ],
+      "generation_rules": [
+        "DUT Id must be lowercase GUID format {xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}.",
+        "Declaration CDATA must include a valid TYPE...END_TYPE block.",
+        "No Implementation section is required for DUT files."
+      ],
+      "minimal_skeleton": [
+        "<?xml version=\"1.0\" encoding=\"utf-8\"?>",
+        "<TcPlcObject Version=\"1.1.0.1\" ProductVersion=\"3.1.4024.12\">",
+        "  <DUT Name=\"ST_Example\" Id=\"{12345678-1234-1234-1234-123456789abc}\">",
+        "    <Declaration><![CDATA[TYPE ST_Example : STRUCT",
+        "  nValue : INT;",
+        "END_STRUCT",
+        "END_TYPE]]></Declaration>",
+        "  </DUT>",
+        "</TcPlcObject>"
+      ]
+    },
+    ".TcGVL": {
+      "scope": "TwinCAT global variable list XML",
+      "required_elements": [
+        "TcPlcObject",
+        "GVL",
+        "Declaration"
+      ],
+      "required_attributes": {
+        "TcPlcObject": [
+          "Version",
+          "ProductVersion"
+        ],
+        "GVL": [
+          "Name",
+          "Id"
+        ]
+      },
+      "forbidden_patterns": [
+        "<GVL without Name/Id attributes>",
+        "<Declaration without VAR_GLOBAL ... END_VAR>",
+        "<Implementation>"
+      ],
+      "generation_rules": [
+        "GVL Id must be lowercase GUID format {xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}.",
+        "Declaration CDATA must include VAR_GLOBAL...END_VAR.",
+        "No Implementation section is required for GVL files."
+      ],
+      "minimal_skeleton": [
+        "<?xml version=\"1.0\" encoding=\"utf-8\"?>",
+        "<TcPlcObject Version=\"1.1.0.1\" ProductVersion=\"3.1.4024.12\">",
+        "  <GVL Name=\"GVL_Example\" Id=\"{12345678-1234-1234-1234-123456789abc}\">",
+        "    <Declaration><![CDATA[VAR_GLOBAL",
+        "  bReady : BOOL := FALSE;",
+        "END_VAR]]></Declaration>",
+        "  </GVL>",
+        "</TcPlcObject>"
+      ]
+    },
+    ".TcIO": {
+      "scope": "TwinCAT interface XML",
+      "required_elements": [
+        "TcPlcObject",
+        "Itf",
+        "Declaration"
+      ],
+      "required_attributes": {
+        "TcPlcObject": [
+          "Version",
+          "ProductVersion"
+        ],
+        "Itf": [
+          "Name",
+          "Id"
+        ]
+      },
+      "forbidden_patterns": [
+        "<Itf without Name/Id attributes>",
+        "<Declaration without INTERFACE ... END_INTERFACE>",
+        "<Implementation>"
+      ],
+      "generation_rules": [
+        "Itf Id must be lowercase GUID format {xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}.",
+        "Declaration CDATA must include interface header (INTERFACE Name).",
+        "Define interface members as XML nodes (<Method>, <Property>) instead of inline END_METHOD blocks in Declaration.",
+        "No Implementation section is required for interface files."
+      ],
+      "minimal_skeleton": [
+        "<?xml version=\"1.0\" encoding=\"utf-8\"?>",
+        "<TcPlcObject Version=\"1.1.0.1\" ProductVersion=\"3.1.4024.12\">",
+        "  <Itf Name=\"I_Example\" Id=\"{12345678-1234-1234-1234-123456789abc}\">",
+        "    <Declaration><![CDATA[INTERFACE I_Example",
+        "]]></Declaration>",
+        "    <Method Name=\"M_Execute\" Id=\"{22345678-1234-1234-1234-123456789abc}\">",
+        "      <Declaration><![CDATA[METHOD M_Execute : BOOL",
+        "VAR_INPUT",
+        "END_VAR",
+        "]]></Declaration>",
+        "    </Method>",
+        "  </Itf>",
+        "</TcPlcObject>"
+      ]
+    }
+  }
+}

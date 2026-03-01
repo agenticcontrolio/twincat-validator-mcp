@@ -1,0 +1,76 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyc
+*.pyo
+*.pyd
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+.pytest_cache/
+*.egg
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+.virtualenv
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+
+# Testing
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+
+# Type checking
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+
+# Logs
+*.log
+pip-log.txt
+pip-delete-this-directory.txt
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Packaging
+*.whl
+*.tar.gz
+MANIFEST
+
+# Project specific
+*.xml.backup
+*.bak
+test_output/
+outputs/*.TcGVL
+outputs/*.TcPOU
+outputs/*.TcDUT
+!outputs/.gitkeep
+
+# Temporary files
+*.tmp
+*.temp
+~*
+.claude/
+*.dxt

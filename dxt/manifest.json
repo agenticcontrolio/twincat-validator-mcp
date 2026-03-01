@@ -1,0 +1,52 @@
+{
+  "manifest_version": "0.3",
+  "name": "twincat-validator",
+  "display_name": "TwinCAT Validator",
+  "version": "1.1.0",
+  "description": "Validate and auto-fix TwinCAT XML files (.TcPOU, .TcIO, .TcDUT, .TcGVL) with AI-powered assistance",
+  "long_description": "An MCP server that validates, auto-fixes, and scaffolds TwinCAT 3 XML files. Provides 16 tools covering structural validation, 21 IEC 61131-3 OOP checks, deterministic auto-fix pipelines, canonical skeleton generation, and batch orchestration workflows.",
+  "author": {
+    "name": "Jaime Calvente Mieres",
+    "url": "https://github.com/jaimecalvente"
+  },
+  "homepage": "https://github.com/jaimecalvente/twincat-validator-mcp",
+  "documentation": "https://github.com/jaimecalvente/twincat-validator-mcp#readme",
+  "license": "MIT",
+  "icon": "icons/icon.png",
+  "server": {
+    "type": "stdio",
+    "command": "twincat-validator-mcp",
+    "args": []
+  },
+  "tools": [
+    {"name": "validate_file", "description": "Full validation of a single TwinCAT file"},
+    {"name": "validate_batch", "description": "Validate multiple files matching glob patterns"},
+    {"name": "validate_for_import", "description": "Quick critical-only check for import readiness"},
+    {"name": "check_specific", "description": "Run a named subset of validation checks"},
+    {"name": "get_validation_summary", "description": "Return a 0-100 health score with issue counts"},
+    {"name": "suggest_fixes", "description": "Generate prioritized fix recommendations"},
+    {"name": "autofix_file", "description": "Apply all safe auto-fixes to a single file"},
+    {"name": "autofix_batch", "description": "Apply auto-fixes to multiple files"},
+    {"name": "generate_skeleton", "description": "Generate a canonical deterministic XML skeleton"},
+    {"name": "extract_methods_to_xml", "description": "Promote inline METHOD blocks to XML elements"},
+    {"name": "process_twincat_single", "description": "Full enforced pipeline: validate → autofix → validate"},
+    {"name": "process_twincat_batch", "description": "Full enforced pipeline across multiple files"},
+    {"name": "verify_determinism_batch", "description": "Run pipeline twice and report idempotence stability"},
+    {"name": "get_effective_oop_policy", "description": "Resolve the active OOP validation policy for a path"},
+    {"name": "lint_oop_policy", "description": "Validate the nearest .twincat-validator.json config file"},
+    {"name": "get_context_pack", "description": "Return curated knowledge-base entries scoped to a workflow stage"}
+  ],
+  "keywords": [
+    "twincat",
+    "plc",
+    "automation",
+    "beckhoff",
+    "validation",
+    "iec61131",
+    "structured-text",
+    "mcp"
+  ],
+  "compatibility": {
+    "python": ">=3.11"
+  }
+}

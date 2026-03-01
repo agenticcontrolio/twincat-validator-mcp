@@ -1,0 +1,89 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+# Use automatic package discovery since twincat_validator/ is a proper package directory
+packages = { find = { where = ["."], include = ["twincat_validator*"] } }
+
+[tool.setuptools.package-data]
+# Config files are in twincat_validator/config/ directory
+twincat_validator = ["config/*.json"]
+
+[project]
+name = "twincat-validator-mcp"
+version = "1.0.0"
+description = "MCP server for TwinCAT XML validation and auto-fixing"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [
+    {name = "Jaime Calvente Mieres", email = "jaimecalvente@users.noreply.github.com"}
+]
+maintainers = [
+    {name = "Jaime Calvente Mieres", email = "jaimecalvente@users.noreply.github.com"}
+]
+keywords = ["mcp", "twincat", "validation", "plc", "automation", "beckhoff", "iec61131", "structured-text"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Manufacturing",
+    "Topic :: Software Development :: Quality Assurance",
+    "Topic :: Software Development :: Testing",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
+    "Environment :: Console",
+    "Typing :: Typed",
+]
+
+dependencies = [
+    "mcp>=1.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/jaimecalvente/twincat-validator-mcp"
+Documentation = "https://github.com/jaimecalvente/twincat-validator-mcp#readme"
+Repository = "https://github.com/jaimecalvente/twincat-validator-mcp"
+Changelog = "https://github.com/jaimecalvente/twincat-validator-mcp/blob/main/CHANGELOG.md"
+"Bug Tracker" = "https://github.com/jaimecalvente/twincat-validator-mcp/issues"
+
+[project.scripts]
+twincat-validator-mcp = "twincat_validator.server:main"
+
+[project.entry-points."mcp_servers"]
+twincat_validator = "twincat_validator.server:main"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-cov>=4.1.0",
+    "black==25.11.0",
+    "mypy>=1.5.0",
+    "ruff>=0.1.0",
+    "tox>=4.0.0",
+]
+
+[tool.black]
+line-length = 100
+target-version = ['py311']
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+asyncio_mode = "auto"

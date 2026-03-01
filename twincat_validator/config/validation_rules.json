@@ -1,0 +1,374 @@
+{
+  "oop_policy": {
+    "enforce_override_super_call": false,
+    "required_super_methods": [],
+    "enforce_fb_init_super_call": true,
+    "enforce_this_pointer_consistency": true,
+    "enforce_interface_contract_integrity": true,
+    "allow_abstract_keyword": true
+  },
+  "checks": [
+    {
+      "id": "xml_structure",
+      "name": "XML Structure Validity",
+      "description": "Checks if the file is valid, well-formed XML",
+      "severity": "critical",
+      "auto_fixable": false,
+      "category": "structure"
+    },
+    {
+      "id": "guid_format",
+      "name": "GUID Format Validation",
+      "description": "Validates GUID format: {xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx} (lowercase hex only)",
+      "severity": "critical",
+      "auto_fixable": true,
+      "category": "guid"
+    },
+    {
+      "id": "guid_uniqueness",
+      "name": "GUID Uniqueness Check",
+      "description": "Ensures all GUIDs are unique within the file",
+      "severity": "critical",
+      "auto_fixable": false,
+      "category": "guid"
+    },
+    {
+      "id": "indentation",
+      "name": "2-Space Indentation",
+      "description": "Checks for consistent 2-space indentation",
+      "severity": "warning",
+      "auto_fixable": true,
+      "category": "style"
+    },
+    {
+      "id": "tabs",
+      "name": "Tab Detection",
+      "description": "Detects tab characters (should use spaces)",
+      "severity": "warning",
+      "auto_fixable": true,
+      "category": "style"
+    },
+    {
+      "id": "file_ending",
+      "name": "File Ending Format",
+      "description": "Ensures file ends with </TcPlcObject> only",
+      "severity": "critical",
+      "auto_fixable": true,
+      "category": "structure"
+    },
+    {
+      "id": "property_var_blocks",
+      "name": "Property VAR Blocks",
+      "description": "Ensures all property getters have VAR blocks",
+      "severity": "critical",
+      "auto_fixable": true,
+      "category": "structure"
+    },
+    {
+      "id": "lineids_count",
+      "name": "LineIds Count",
+      "description": "Validates LineIds count matches methods/properties",
+      "severity": "critical",
+      "auto_fixable": true,
+      "category": "structure"
+    },
+    {
+      "id": "element_ordering",
+      "name": "Element Ordering",
+      "description": "Checks if elements are in correct order",
+      "severity": "warning",
+      "auto_fixable": false,
+      "category": "best_practice"
+    },
+    {
+      "id": "naming_conventions",
+      "name": "Naming Conventions",
+      "description": "Validates TwinCAT naming conventions (FB_, I_, ST_, etc.)",
+      "severity": "warning",
+      "auto_fixable": false,
+      "category": "best_practice"
+    },
+    {
+      "id": "cdata_formatting",
+      "name": "CDATA Formatting",
+      "description": "Checks CDATA section formatting",
+      "severity": "info",
+      "auto_fixable": true,
+      "category": "style"
+    },
+    {
+      "id": "excessive_blank_lines",
+      "name": "Excessive Blank Lines",
+      "description": "Detects excessive consecutive blank lines (>3 in a row)",
+      "severity": "warning",
+      "auto_fixable": true,
+      "category": "style"
+    },
+    {
+      "id": "pou_structure",
+      "name": "POU Structure Validation",
+      "description": "Validates POU subtype-specific structure (FUNCTION cannot have Methods/Properties/Actions, FUNCTION must have return type)",
+      "severity": "critical",
+      "auto_fixable": false,
+      "category": "structure",
+      "umbrella_alias": true
+    },
+    {
+      "id": "pou_structure_header",
+      "name": "POU Header Structure",
+      "description": "Checks POU header-level integrity: misfiled INTERFACE in .TcPOU, inline STRUCT in variable section, invalid EXTENDS usage",
+      "severity": "critical",
+      "auto_fixable": false,
+      "category": "structure"
+    },
+    {
+      "id": "pou_structure_var_protected",
+      "name": "VAR PROTECTED / VAR_PROTECTED Block Prohibition",
+      "description": "SERVER POLICY: 'VAR PROTECTED' and 'VAR_PROTECTED' are forbidden variable block keywords. Use VAR...END_VAR and expose members via METHOD/PROPERTY with PROTECTED access specifier.",
+      "severity": "error",
+      "auto_fixable": false,
+      "category": "structure",
+      "guidance_only": true
+    },
+    {
+      "id": "pou_structure_methods",
+      "name": "POU Method Structure",
+      "description": "Checks method-level structural integrity: METHOD in main ST, VAR in method impl, invalid RETURN, VAR_INPUT mutations, undeclared assignments",
+      "severity": "critical",
+      "auto_fixable": false,
+      "category": "structure"
+    },
+    {
+      "id": "main_var_input_mutation",
+      "name": "Main ST VAR_INPUT Mutation",
+      "description": "Detects assignments to POU VAR_INPUT symbols in main <Implementation><ST> block",
+      "severity": "critical",
+      "auto_fixable": false,
+      "category": "structure"
+    },
+    {
+      "id": "pou_structure_interface",
+      "name": "POU Interface Contract",
+      "description": "Checks IMPLEMENTS clause: interface file existence, method signature matching",
+      "severity": "critical",
+      "auto_fixable": false,
+      "category": "structure"
+    },
+    {
+      "id": "pou_structure_syntax",
+      "name": "POU ST Syntax Guard",
+      "description": "Checks basic ST syntax in main implementation: unbalanced brackets, missing semicolons",
+      "severity": "critical",
+      "auto_fixable": false,
+      "category": "structure"
+    },
+    {
+      "id": "unsigned_loop_underflow",
+      "name": "Unsigned Loop Underflow Guard",
+      "description": "Detects FOR loops with upper bound pattern 'unsigned_symbol - 1' which can underflow when symbol is zero",
+      "severity": "critical",
+      "auto_fixable": false,
+      "category": "structure"
+    },
+    {
+      "id": "pou_structure_subtype",
+      "name": "POU Subtype Constraints",
+      "description": "Checks FUNCTION and PROGRAM specific constraints: FUNCTION must have return type, cannot have Methods/Properties/Actions; PROGRAM cannot have Properties",
+      "severity": "critical",
+      "auto_fixable": false,
+      "category": "structure"
+    },
+    {
+      "id": "extends_visibility",
+      "name": "EXTENDS Visibility Safety",
+      "description": "Ensures derived FUNCTION_BLOCK does not access private members of base FUNCTION_BLOCK",
+      "severity": "critical",
+      "auto_fixable": false,
+      "category": "oop"
+    },
+    {
+      "id": "override_marker",
+      "name": "Override Marker Validation",
+      "description": "Ensures overriding methods use explicit canonical override marker syntax",
+      "severity": "critical",
+      "auto_fixable": false,
+      "category": "oop"
+    },
+    {
+      "id": "override_signature",
+      "name": "Override Signature Compatibility",
+      "description": "Ensures overriding methods match base method signatures exactly",
+      "severity": "critical",
+      "auto_fixable": false,
+      "category": "oop"
+    },
+    {
+      "id": "interface_contract",
+      "name": "Interface Contract Compatibility",
+      "description": "Ensures IMPLEMENTS contracts are complete and signature-compatible for methods/properties",
+      "severity": "critical",
+      "auto_fixable": false,
+      "category": "oop"
+    },
+    {
+      "id": "policy_interface_contract_integrity",
+      "name": "Policy Interface Contract Integrity",
+      "description": "Blocks architecture-weakening patterns where abstract base classes remove explicit IMPLEMENTS declarations despite matching interface contracts and active descendants",
+      "severity": "critical",
+      "auto_fixable": false,
+      "category": "oop"
+    },
+    {
+      "id": "extends_cycle",
+      "name": "EXTENDS Cycle Detection",
+      "description": "Ensures FUNCTION_BLOCK inheritance graph has no EXTENDS cycles",
+      "severity": "critical",
+      "auto_fixable": false,
+      "category": "oop"
+    },
+    {
+      "id": "override_super_call",
+      "name": "Override Base Call Safety",
+      "description": "Ensures overriding lifecycle methods call SUPER^ for base behavior continuity",
+      "severity": "critical",
+      "auto_fixable": false,
+      "category": "oop"
+    },
+    {
+      "id": "inheritance_property_contract",
+      "name": "Inheritance Property Contract",
+      "description": "Ensures derived properties preserve base type and accessor mutability contract",
+      "severity": "critical",
+      "auto_fixable": false,
+      "category": "oop"
+    },
+    {
+      "id": "fb_init_signature",
+      "name": "FB_init Signature Contract",
+      "description": "Ensures FB_init uses canonical TwinCAT signature and BOOL return",
+      "severity": "critical",
+      "auto_fixable": false,
+      "category": "oop"
+    },
+    {
+      "id": "fb_init_super_call",
+      "name": "FB_init SUPER Call",
+      "description": "Ensures derived FB_init calls SUPER^.FB_init(...) when base defines FB_init",
+      "severity": "critical",
+      "auto_fixable": false,
+      "category": "oop"
+    },
+    {
+      "id": "this_pointer_consistency",
+      "name": "THIS Pointer Consistency",
+      "description": "Detects ambiguous member shadowing and enforces explicit THIS^ member writes",
+      "severity": "critical",
+      "auto_fixable": false,
+      "category": "oop"
+    },
+    {
+      "id": "abstract_contract",
+      "name": "Abstract Class/Method Contract",
+      "description": "Validates ABSTRACT class/method semantics and inherited abstract method implementation in concrete classes",
+      "severity": "critical",
+      "auto_fixable": false,
+      "category": "oop"
+    },
+    {
+      "id": "fb_exit_contract",
+      "name": "FB_exit Signature Contract",
+      "description": "Validates FB_exit canonical signature (bInCopyCode : BOOL) : BOOL and warns if missing when __NEW() is used",
+      "severity": "critical",
+      "auto_fixable": false,
+      "category": "oop"
+    },
+    {
+      "id": "dynamic_creation_attribute",
+      "name": "Dynamic Creation Attribute Requirement",
+      "description": "Ensures FBs used with __NEW() have {attribute 'enable_dynamic_creation'} or allocation silently fails at runtime",
+      "severity": "critical",
+      "auto_fixable": false,
+      "category": "oop"
+    },
+    {
+      "id": "pointer_delete_pairing",
+      "name": "Pointer Allocation/Deallocation Pairing",
+      "description": "Ensures every __NEW() allocation has a matching __DELETE() in cleanup methods (FB_exit, Dispose, Cleanup) to prevent memory leaks",
+      "severity": "critical",
+      "auto_fixable": false,
+      "category": "oop"
+    },
+    {
+      "id": "composition_depth",
+      "name": "Composition Over Inheritance Depth",
+      "description": "Warns when inheritance depth exceeds configurable maximum (default: 4 levels). Deep inheritance violates SOLID principles and increases coupling",
+      "severity": "warning",
+      "auto_fixable": false,
+      "category": "oop"
+    },
+    {
+      "id": "interface_segregation",
+      "name": "Interface Segregation Principle",
+      "description": "Warns when interface surface area (methods + properties) exceeds configurable maximum (default: 7 members). Large interfaces force clients to depend on methods they don't use",
+      "severity": "warning",
+      "auto_fixable": false,
+      "category": "oop"
+    },
+    {
+      "id": "method_visibility_consistency",
+      "name": "Method Visibility Consistency (Liskov)",
+      "description": "Ensures derived methods don't reduce visibility (PUBLIC → PROTECTED → PRIVATE). Reducing visibility violates Liskov Substitution Principle",
+      "severity": "warning",
+      "auto_fixable": false,
+      "category": "oop"
+    },
+    {
+      "id": "diamond_inheritance_warning",
+      "name": "Diamond Inheritance Detection",
+      "description": "Warns when the same interface is inherited from multiple paths in the inheritance hierarchy. This can cause ambiguous method dispatch",
+      "severity": "warning",
+      "auto_fixable": false,
+      "category": "oop"
+    },
+    {
+      "id": "abstract_instantiation",
+      "name": "Abstract Instantiation Prevention",
+      "description": "Prevents runtime crashes by detecting attempts to instantiate abstract function blocks with __NEW(). Abstract FBs can only be used as base classes",
+      "severity": "critical",
+      "auto_fixable": false,
+      "category": "oop"
+    },
+    {
+      "id": "property_accessor_pairing",
+      "name": "Property Accessor Pairing",
+      "description": "Warns about properties with only getter or only setter. Asymmetric properties often indicate incomplete implementation. Configurable via allow_readonly_properties and allow_writeonly_properties",
+      "severity": "warning",
+      "auto_fixable": false,
+      "category": "oop"
+    },
+    {
+      "id": "method_count",
+      "name": "Method Count per POU",
+      "description": "Warns when a POU has too many methods + properties (default: 15 members). Excessive members indicate Single Responsibility Principle violation. Configurable via max_methods_per_pou",
+      "severity": "warning",
+      "auto_fixable": false,
+      "category": "oop"
+    },
+    {
+      "id": "forbidden_abstract_attribute",
+      "name": "Forbidden Abstract Attribute",
+      "description": "Detects {attribute 'abstract'} which is not valid TwinCAT 3 syntax. The compiler rejects it. Use METHOD ABSTRACT or FUNCTION_BLOCK ABSTRACT keyword syntax instead.",
+      "severity": "error",
+      "auto_fixable": false,
+      "category": "oop"
+    },
+    {
+      "id": "hardcoded_dispatch",
+      "name": "Hardcoded Array-Index Dispatch",
+      "description": "Warns when the same method is called on an array with multiple hardcoded integer literals (e.g. arr[1].M_Reset / arr[2].M_Reset). Use a FOR loop over an interface array instead.",
+      "severity": "warning",
+      "auto_fixable": false,
+      "category": "oop"
+    }
+  ]
+}

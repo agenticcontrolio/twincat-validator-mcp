@@ -1,0 +1,1128 @@
+{
+  "version": "1.0.0",
+  "knowledge_base": {
+    "checks": {
+      "xml_structure": {
+        "explanation": "TwinCAT XML files must be well-formed XML compliant with XML 1.0 specification. All elements must be properly opened and closed, attributes must be quoted, and special characters must be escaped.",
+        "why_it_matters": "Malformed XML prevents TwinCAT XAE from parsing the file during import. The IDE will fail silently or show cryptic error messages, making it impossible to load the project.",
+        "correct_examples": [
+          {
+            "description": "Valid TwinCAT POU XML structure",
+            "code": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<TcPlcObject Version=\"1.1.0.1\" ProductVersion=\"3.1.4024.0\">\n  <POU Name=\"FB_Example\" Id=\"{a1b2c3d4-e5f6-7890-abcd-ef1234567890}\">\n  </POU>\n</TcPlcObject>"
+          }
+        ],
+        "common_mistakes": [
+          {
+            "mistake": "Unclosed tags",
+            "code": "<POU Name=\"FB_Example\">\n  <Declaration>",
+            "reason": "All XML tags must have matching closing tags"
+          },
+          {
+            "mistake": "Unescaped special characters in CDATA",
+            "code": "<![CDATA[VAR\n  x : INT := 5 > 3;\nEND_VAR]]>",
+            "reason": "Use &gt; for > and &lt; for < outside CDATA sections"
+          }
+        ],
+        "twincat_reference": "TwinCAT 3 XAE uses standard XML parsing; any XML parsing error causes import failure"
+      },
+      "guid_format": {
+        "explanation": "GUIDs (Globally Unique Identifiers) in TwinCAT must follow RFC 4122 format with lowercase hexadecimal notation: {xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx} where x is 0-9 or a-f.",
+        "why_it_matters": "Invalid GUID formats break object linking in TwinCAT IDE. The project may fail to load, or objects may appear orphaned in the solution tree without proper references.",
+        "correct_examples": [
+          {
+            "description": "Valid GUID in lowercase hex",
+            "code": "<POU Name=\"FB_Motor\" Id=\"{a1b2c3d4-e5f6-7890-abcd-ef1234567890}\">"
+          },
+          {
+            "description": "Valid GUID for interface",
+            "code": "<Itf Name=\"I_Moveable\" Id=\"{12345678-90ab-cdef-1234-567890abcdef}\">"
+          }
+        ],
+        "common_mistakes": [
+          {
+            "mistake": "Uppercase letters in GUID",
+            "code": "<POU Id=\"{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}\">",
+            "reason": "TwinCAT requires lowercase hex (a-f), not uppercase (A-F)"
+          },
+          {
+            "mistake": "Placeholder GUID never replaced",
+            "code": "<POU Id=\"GENERATE-NEW-GUID\">",
+            "reason": "Placeholder is not a valid GUID format; use Tools > Generate GUID in Visual Studio"
+          },
+          {
+            "mistake": "Missing braces",
+            "code": "<POU Id=\"a1b2c3d4-e5f6-7890-abcd-ef1234567890\">",
+            "reason": "GUIDs must be wrapped in curly braces {}"
+          }
+        ],
+        "twincat_reference": "TwinCAT XAE validates GUID format during XML import; non-conformant GUIDs cause silent failures"
+      },
+      "guid_uniqueness": {
+        "explanation": "Every POU, interface, method, property, and DUT in a TwinCAT project must have a unique GUID. Duplicate GUIDs cause object reference conflicts.",
+        "why_it_matters": "Duplicate GUIDs break the TwinCAT project database. Objects may be linked incorrectly, breakpoints may trigger in wrong locations, and project corruption can occur.",
+        "correct_examples": [
+          {
+            "description": "Each POU has unique GUID",
+            "code": "<POU Name=\"FB_Motor\" Id=\"{11111111-1111-1111-1111-111111111111}\">\n<POU Name=\"FB_Pump\" Id=\"{22222222-2222-2222-2222-222222222222}\">"
+          }
+        ],
+        "common_mistakes": [
+          {
+            "mistake": "Copy-pasting POUs without regenerating GUIDs",
+            "code": "<POU Name=\"FB_Motor\" Id=\"{same-guid-here}\">\n<POU Name=\"FB_Pump\" Id=\"{same-guid-here}\">",
+            "reason": "Each object must have a unique GUID; regenerate after copy-paste"
+          }
+        ],
+        "twincat_reference": "GUID uniqueness is enforced at project level, not file level; use validate_batch for cross-file checking"
+      },
+      "indentation": {
+        "explanation": "TwinCAT XAE requires exactly 2-space indentation for all XML elements. Tabs and 4-space indentation are not allowed.",
+        "why_it_matters": "Inconsistent indentation causes import errors or silent rejections in TwinCAT IDE. The XAE editor auto-formats with 2 spaces, so files with incorrect indentation are reformatted on first edit, causing version control churn.",
+        "correct_examples": [
+          {
+            "description": "2-space indentation in nested elements",
+            "code": "<Declaration>\n  <ObjectProperties>\n    <Name>MyObject</Name>\n  </ObjectProperties>\n</Declaration>"
+          }
+        ],
+        "common_mistakes": [
+          {
+            "mistake": "4-space indentation (common in other languages)",
+            "code": "<Declaration>\n    <ObjectProperties>\n        <Name>MyObject</Name>",
+            "reason": "TwinCAT strictly enforces 2-space indentation, not 4"
+          },
+          {
+            "mistake": "Tab characters",
+            "code": "<Declaration>\n\t<ObjectProperties>",
+            "reason": "Tabs are not allowed; always use 2 spaces"
+          },
+          {
+            "mistake": "Odd number of spaces (3, 5, 7)",
+            "code": "   <Name>Test</Name>",
+            "reason": "Indentation must be multiples of 2 (0, 2, 4, 6, ...)"
+          }
+        ],
+        "twincat_reference": "XAE auto-formats on file open; indentation errors are immediately visible in diff tools"
+      },
+      "tabs": {
+        "explanation": "TwinCAT XML files must not contain tab characters (\\t). All indentation must use space characters only, specifically 2 spaces per level.",
+        "why_it_matters": "Tab characters cause TwinCAT XAE to reject the file during import or auto-format it on first edit, creating version control conflicts.",
+        "correct_examples": [
+          {
+            "description": "Space-based indentation",
+            "code": "<POU>\n  <Declaration>\n    <Name>FB_Test</Name>\n  </Declaration>\n</POU>"
+          }
+        ],
+        "common_mistakes": [
+          {
+            "mistake": "Tab characters from external editors",
+            "code": "<POU>\n\t<Declaration>\n\t\t<Name>FB_Test</Name>",
+            "reason": "Configure your editor to use spaces, not tabs (most editors have 'insert spaces' option)"
+          },
+          {
+            "mistake": "Mixed tabs and spaces",
+            "code": "<POU>\n  <Declaration>\n\t  <Name>FB_Test</Name>",
+            "reason": "Never mix tabs and spaces; use spaces consistently"
+          }
+        ],
+        "twincat_reference": "TwinCAT XAE will auto-convert tabs to 2 spaces on file open"
+      },
+      "file_ending": {
+        "explanation": "TwinCAT XML files must end with exactly </TcPlcObject> followed by a single newline. Extra content after the closing tag (like ]]>) breaks parsing.",
+        "why_it_matters": "Extra content after </TcPlcObject> causes XML parsing errors in TwinCAT XAE. The file may appear to load but fail during compilation or cause IDE crashes.",
+        "correct_examples": [
+          {
+            "description": "Correct file ending",
+            "code": "  </POU>\n</TcPlcObject>\n"
+          }
+        ],
+        "common_mistakes": [
+          {
+            "mistake": "Extra ]]> after closing tag",
+            "code": "</TcPlcObject>\n]]>",
+            "reason": "CDATA closing ]]> should never appear outside CDATA sections"
+          },
+          {
+            "mistake": "Multiple newlines at end",
+            "code": "</TcPlcObject>\n\n\n\n",
+            "reason": "Use exactly one newline after </TcPlcObject>"
+          },
+          {
+            "mistake": "No newline at end",
+            "code": "</TcPlcObject>",
+            "reason": "POSIX standard requires files to end with a newline"
+          }
+        ],
+        "twincat_reference": "TwinCAT XAE strictly validates XML document termination"
+      },
+      "property_var_blocks": {
+        "explanation": "Property getter/setter accessors in TwinCAT function blocks must declare a VAR...END_VAR block, even if empty. This is required for ST (Structured Text) compilation.",
+        "why_it_matters": "Missing VAR blocks cause compilation errors: 'syntax error: missing END_VAR'. Properties without VAR blocks will fail to compile in TwinCAT XAE.",
+        "correct_examples": [
+          {
+            "description": "Property getter with VAR block",
+            "code": "<Get Name=\"Get\" Id=\"{guid}\">\n  <Declaration><![CDATA[VAR\nEND_VAR\n]]></Declaration>\n</Get>"
+          },
+          {
+            "description": "Property getter with variables",
+            "code": "<Get Name=\"Get\" Id=\"{guid}\">\n  <Declaration><![CDATA[VAR\n  nLocal : INT;\nEND_VAR\n]]></Declaration>\n</Get>"
+          }
+        ],
+        "common_mistakes": [
+          {
+            "mistake": "Empty CDATA in property getter",
+            "code": "<Get Name=\"Get\" Id=\"{guid}\">\n  <Declaration><![CDATA[]]></Declaration>\n</Get>",
+            "reason": "Property getters must have VAR...END_VAR block"
+          },
+          {
+            "mistake": "Missing Declaration element entirely",
+            "code": "<Get Name=\"Get\" Id=\"{guid}\">\n</Get>",
+            "reason": "All property accessors require a Declaration element"
+          }
+        ],
+        "twincat_reference": "TwinCAT ST compiler requires VAR blocks for all property accessors; applies to FB and program properties"
+      },
+      "lineids_count": {
+        "explanation": "LineIds are metadata entries that map source code lines to their locations in the XML. The count of LineIds entries must equal the number of methods/properties plus one for the main POU body.",
+        "why_it_matters": "Incorrect LineIds counts prevent TwinCAT debugger from setting breakpoints correctly. Breakpoints may be placed in wrong methods or not trigger at all.",
+        "correct_examples": [
+          {
+            "description": "FB with 1 method = 2 LineIds entries",
+            "code": "<LineIds Name=\"FB_Test\">\n  <LineId Id=\"2\" Count=\"0\" />\n</LineIds>\n<LineIds Name=\"FB_Test.Execute\">\n  <LineId Id=\"2\" Count=\"0\" />\n</LineIds>"
+          }
+        ],
+        "common_mistakes": [
+          {
+            "mistake": "Missing LineIds for new method",
+            "code": "// Added M_NewMethod but forgot to add LineIds entry",
+            "reason": "Every method/property needs a corresponding LineIds entry"
+          },
+          {
+            "mistake": "Stale LineIds after method deletion",
+            "code": "// Deleted M_OldMethod but LineIds entry still exists",
+            "reason": "Remove LineIds entries when deleting methods/properties"
+          }
+        ],
+        "twincat_reference": "TwinCAT XAE generates LineIds automatically; manual XML editing requires manual LineIds maintenance"
+      },
+      "element_ordering": {
+        "explanation": "TwinCAT XML elements must appear in specific order: Declaration before Implementation, and Methods/Properties after the main Implementation section.",
+        "why_it_matters": "Incorrect element ordering causes TwinCAT XAE import errors. The IDE expects a specific XML schema and will reject out-of-order elements.",
+        "correct_examples": [
+          {
+            "description": "Correct element order",
+            "code": "<POU>\n  <Declaration>...</Declaration>\n  <Implementation>...</Implementation>\n  <Method>...</Method>\n  <Property>...</Property>\n</POU>"
+          }
+        ],
+        "common_mistakes": [
+          {
+            "mistake": "Implementation before Declaration",
+            "code": "<POU>\n  <Implementation>...</Implementation>\n  <Declaration>...</Declaration>",
+            "reason": "Declaration must come before Implementation"
+          },
+          {
+            "mistake": "Method before Implementation",
+            "code": "<POU>\n  <Declaration>...</Declaration>\n  <Method>...</Method>\n  <Implementation>...</Implementation>",
+            "reason": "Methods must come after Implementation"
+          }
+        ],
+        "twincat_reference": "TwinCAT XAE enforces strict XML schema ordering"
+      },
+      "naming_conventions": {
+        "explanation": "TwinCAT naming conventions use prefixes to identify object types: FB_ for function blocks, PRG_ for programs, I_ for interfaces, ST_ for structs, E_ for enums, T_ for type aliases, and GVL_ for global variable lists.",
+        "why_it_matters": "Consistent naming conventions improve code readability and project navigation. Many TwinCAT teams enforce naming standards via code reviews.",
+        "correct_examples": [
+          {
+            "description": "Function block naming",
+            "code": "<POU Name=\"FB_MotorControl\">"
+          },
+          {
+            "description": "Interface naming",
+            "code": "<Itf Name=\"I_Moveable\">"
+          },
+          {
+            "description": "Struct naming",
+            "code": "<DUT Name=\"ST_Position\">"
+          }
+        ],
+        "common_mistakes": [
+          {
+            "mistake": "Missing prefix",
+            "code": "<POU Name=\"MotorControl\">",
+            "reason": "Function blocks should start with FB_"
+          },
+          {
+            "mistake": "Wrong prefix",
+            "code": "<Itf Name=\"Moveable\">",
+            "reason": "Interfaces should start with I_"
+          }
+        ],
+        "twincat_reference": "Naming conventions follow Beckhoff style guide; see TwinCAT documentation"
+      },
+      "cdata_formatting": {
+        "explanation": "CDATA sections in TwinCAT XML should not have trailing newlines before the closing ]]>. Property declarations in particular should be on a single line within CDATA.",
+        "why_it_matters": "Extra newlines in CDATA cause TwinCAT XAE to auto-format files on open, creating version control noise.",
+        "correct_examples": [
+          {
+            "description": "Property declaration without trailing newline",
+            "code": "<Declaration><![CDATA[PROPERTY CurrentSpeed : INT]]></Declaration>"
+          }
+        ],
+        "common_mistakes": [
+          {
+            "mistake": "Trailing newline in property declaration",
+            "code": "<Declaration><![CDATA[PROPERTY CurrentSpeed : INT\n]]></Declaration>",
+            "reason": "No newline should appear before ]]> in property declarations"
+          }
+        ],
+        "twincat_reference": "TwinCAT XAE auto-formats CDATA sections to remove trailing whitespace"
+      },
+      "excessive_blank_lines": {
+        "explanation": "TwinCAT XML files should not contain more than 2 consecutive blank lines. Excessive blank lines are considered poor formatting.",
+        "why_it_matters": "Excessive blank lines bloat file size and reduce code density. TwinCAT XAE will reformat files to remove excess whitespace.",
+        "correct_examples": [
+          {
+            "description": "Maximum 2 consecutive blank lines",
+            "code": "</Method>\n\n<Method Name=\"Next\">"
+          }
+        ],
+        "common_mistakes": [
+          {
+            "mistake": "4+ consecutive blank lines",
+            "code": "</Method>\n\n\n\n\n<Method Name=\"Next\">",
+            "reason": "Limit to maximum 2 consecutive blank lines"
+          }
+        ],
+        "twincat_reference": "TwinCAT XAE removes excessive blank lines on auto-format"
+      },
+      "pou_structure": {
+        "explanation": "FUNCTION POUs in TwinCAT cannot contain Methods or Properties. Only FUNCTION_BLOCK and PROGRAM POUs support methods and properties.",
+        "why_it_matters": "FUNCTIONs with methods/properties fail TwinCAT compilation with error: 'Functions cannot have methods'. This is a language-level restriction.",
+        "correct_examples": [
+          {
+            "description": "FUNCTION without methods (correct)",
+            "code": "<POU Name=\"F_Calculate\" PouType=\"Function\">\n  <Declaration>...</Declaration>\n  <Implementation>...</Implementation>\n</POU>"
+          },
+          {
+            "description": "FUNCTION_BLOCK with methods (correct)",
+            "code": "<POU Name=\"FB_Controller\" PouType=\"FunctionBlock\">\n  <Declaration>...</Declaration>\n  <Implementation>...</Implementation>\n  <Method Name=\"Execute\">...</Method>\n</POU>"
+          }
+        ],
+        "common_mistakes": [
+          {
+            "mistake": "FUNCTION containing methods",
+            "code": "<POU Name=\"F_Calculate\" PouType=\"Function\">\n  <Method Name=\"Helper\">...</Method>\n</POU>",
+            "reason": "FUNCTIONs cannot have methods; use FUNCTION_BLOCK instead"
+          }
+        ],
+        "twincat_reference": "IEC 61131-3 language specification: FUNCTIONs are stateless and cannot have methods"
+      },
+      "pou_structure_header": {
+        "explanation": "POU header integrity check. Catches misfiled INTERFACE declarations stored in .TcPOU files (must be .TcIO), inline STRUCT definitions inside VAR sections, and invalid EXTENDS usage (only FUNCTION_BLOCK can extend).",
+        "why_it_matters": "A .TcPOU file containing INTERFACE will be silently ignored or cause import errors. Inline STRUCTs in VAR sections are not valid IEC 61131-3. EXTENDS on FUNCTION or PROGRAM causes compile errors.",
+        "correct_examples": [
+          {
+            "description": "Interface in correct file type (.TcIO)",
+            "code": "<Itf Name=\"I_Sensor\">\n  <Declaration>INTERFACE I_Sensor\nEND_INTERFACE\n</Declaration>\n</Itf>"
+          }
+        ],
+        "common_mistakes": [
+          {
+            "mistake": "INTERFACE declaration inside a .TcPOU file",
+            "code": "INTERFACE I_Sensor\nEND_INTERFACE",
+            "reason": "Interfaces must be stored in .TcIO files with an <Itf> root element"
+          }
+        ],
+        "twincat_reference": "TwinCAT file type conventions: .TcIO for interfaces, .TcPOU for function blocks/functions/programs"
+      },
+      "pou_structure_methods": {
+        "explanation": "Method-level structural integrity check. Detects METHOD declarations inside the main <Implementation><ST> block, VAR blocks inside method implementations, invalid RETURN syntax, mutations to VAR_INPUT parameters, and assignments to undeclared symbols.",
+        "why_it_matters": "TwinCAT methods must be separate <Method> XML elements, not inlined into the main body. VAR blocks in method implementations cause parse errors. Mutating VAR_INPUT violates IEC 61131-3 input semantics.",
+        "correct_examples": [
+          {
+            "description": "Method as separate XML element",
+            "code": "<Method Name=\"M_Run\">\n  <Declaration>METHOD M_Run : BOOL\nEND_VAR\n</Declaration>\n  <Implementation><ST>M_Run := TRUE;\n</ST></Implementation>\n</Method>"
+          }
+        ],
+        "common_mistakes": [
+          {
+            "mistake": "METHOD keyword inside main Implementation ST block",
+            "code": "METHOD M_Run : BOOL\nM_Run := TRUE;\nEND_METHOD",
+            "reason": "Methods must be separate XML elements, not inline in the main body"
+          }
+        ],
+        "twincat_reference": "TwinCAT XML file format: methods are child XML elements of the POU, not inline ST code"
+      },
+      "main_var_input_mutation": {
+        "explanation": "Detects assignments to POU-level VAR_INPUT symbols inside the main <Implementation><ST> block.",
+        "why_it_matters": "VAR_INPUT represents caller-owned inputs and should be treated as read-only. Writing to input pins creates hidden state and non-deterministic behavior across scan cycles.",
+        "correct_examples": [
+          {
+            "description": "Use internal latch instead of mutating input",
+            "code": "IF bResetReq THEN\n  _bResetLatch := TRUE;\nEND_IF;"
+          }
+        ],
+        "common_mistakes": [
+          {
+            "mistake": "Mutating a POU VAR_INPUT in main body",
+            "code": "bResetAll := FALSE;",
+            "reason": "This writes to caller-provided input instead of using internal state"
+          }
+        ],
+        "twincat_reference": "IEC 61131-3 input semantics: VAR_INPUT values are inputs to execution and should not be reassigned"
+      },
+      "pou_structure_interface": {
+        "explanation": "IMPLEMENTS clause contract check. Verifies that interface files (.TcIO) exist for each interface listed in IMPLEMENTS, and that method signatures match the interface declaration.",
+        "why_it_matters": "An IMPLEMENTS clause without a matching .TcIO file causes import failure. Signature mismatches between implementation and interface cause compile errors.",
+        "correct_examples": [
+          {
+            "description": "FUNCTION_BLOCK implementing a declared interface",
+            "code": "FUNCTION_BLOCK FB_Controller IMPLEMENTS I_Controller\nVAR\nEND_VAR"
+          }
+        ],
+        "common_mistakes": [
+          {
+            "mistake": "IMPLEMENTS clause referencing a missing .TcIO file",
+            "code": "FUNCTION_BLOCK FB_Ctrl IMPLEMENTS I_Missing",
+            "reason": "Create I_Missing.TcIO with the interface declaration"
+          }
+        ],
+        "twincat_reference": "TwinCAT OOP: IMPLEMENTS requires matching .TcIO interface file in the same project"
+      },
+      "pou_structure_syntax": {
+        "explanation": "Basic ST syntax guard for the main implementation block. Checks for unbalanced control flow keywords (IF/END_IF, FOR/END_FOR, WHILE/END_WHILE, CASE/END_CASE) and missing semicolons after assignments/control statements.",
+        "why_it_matters": "Unbalanced keywords or missing statement terminators can cause TwinCAT parser errors and prevent compilation. Early detection avoids costly debugging.",
+        "correct_examples": [
+          {
+            "description": "Balanced IF/END_IF with assignment terminator",
+            "code": "IF xFlag THEN\n  nValue := 1;\nEND_IF"
+          }
+        ],
+        "common_mistakes": [
+          {
+            "mistake": "Missing semicolon after assignment",
+            "code": "nValue := 1",
+            "reason": "ST requires semicolons to terminate statements"
+          }
+        ],
+        "twincat_reference": "IEC 61131-3 ST syntax: assignments/control statements require terminators; control keywords must be balanced"
+      },
+      "unsigned_loop_underflow": {
+        "explanation": "Detects FOR-loop upper bounds of the form 'unsigned_symbol - 1' where unsigned_symbol is USINT/UINT/UDINT/ULINT.",
+        "why_it_matters": "If the unsigned symbol is zero, subtracting 1 wraps to max value, causing massive loop ranges and possible out-of-bounds access.",
+        "correct_examples": [
+          {
+            "description": "Guard zero before loop",
+            "code": "IF nCount = 0 THEN\n  RETURN;\nEND_IF;\nFOR i := 0 TO nCount - 1 DO\nEND_FOR;"
+          }
+        ],
+        "common_mistakes": [
+          {
+            "mistake": "Unsigned underflow in FOR upper bound",
+            "code": "FOR i := 0 TO nCount - 1 DO",
+            "reason": "nCount is UINT, so 0 - 1 underflows to 65535"
+          }
+        ],
+        "twincat_reference": "IEC 61131-3 integer arithmetic semantics with unsigned types and TwinCAT FOR-loop bounds"
+      },
+      "pou_structure_subtype": {
+        "explanation": "POU subtype constraint check for FUNCTION and PROGRAM. FUNCTIONs must have a return type and cannot have Methods, Properties, or Actions. PROGRAMs should not have Properties.",
+        "why_it_matters": "FUNCTIONs without return types fail to compile. FUNCTIONs with methods/properties/actions violate IEC 61131-3 language semantics and cause TwinCAT compile errors.",
+        "correct_examples": [
+          {
+            "description": "FUNCTION with return type",
+            "code": "FUNCTION F_Calculate : INT\nVAR_INPUT\n  nA : INT;\nEND_VAR"
+          }
+        ],
+        "common_mistakes": [
+          {
+            "mistake": "FUNCTION without return type",
+            "code": "FUNCTION F_Calculate\nVAR_INPUT\n  nA : INT;\nEND_VAR",
+            "reason": "Add return type: FUNCTION F_Calculate : INT"
+          }
+        ],
+        "twincat_reference": "IEC 61131-3: FUNCTION must have a return type; FUNCTIONs are stateless and cannot have methods or properties"
+      },
+      "pou_structure_var_protected": {
+        "explanation": "SERVER CONTRACT: 'VAR PROTECTED' and 'VAR_PROTECTED' are forbidden variable block keywords in this project. TwinCAT IEC 61131-3 does not support a 'VAR PROTECTED' section. Encapsulation must be expressed through METHOD or PROPERTY access specifiers (e.g. METHOD PROTECTED). Using plain VAR...END_VAR for internal state is the correct pattern.",
+        "why_it_matters": "VAR PROTECTED is not a valid TwinCAT 3 variable block keyword — it is a hallucination. TwinCAT will refuse to import or compile any POU containing this keyword. The correct encapsulation mechanism is to declare variables in VAR...END_VAR and expose them through protected methods or properties.",
+        "correct_examples": [
+          {
+            "description": "Correct: internal state in VAR block, exposed via PROTECTED method",
+            "code": "FUNCTION_BLOCK FB_Example\nVAR\n  _nValue : INT;  (* internal state *)\nEND_VAR\n\n// In a Method XML element:\nMETHOD PROTECTED GetValue : INT\nVAR_INPUT\nEND_VAR\nGetValue := _nValue;"
+          },
+          {
+            "description": "Correct: PROTECTED property exposing internal state",
+            "code": "FUNCTION_BLOCK FB_Example\nVAR\n  _nCounter : INT;\nEND_VAR\n\n// Property XML element with PROTECTED:\nPROPERTY PROTECTED Counter : INT\n// Get accessor returns _nCounter"
+          }
+        ],
+        "common_mistakes": [
+          {
+            "mistake": "Using VAR PROTECTED block (space variant — forbidden)",
+            "code": "FUNCTION_BLOCK FB_Example\nVAR PROTECTED\n  nValue : INT;\nEND_VAR",
+            "reason": "VAR PROTECTED is not a valid TwinCAT keyword. Use VAR...END_VAR with protected METHOD/PROPERTY access specifiers instead."
+          },
+          {
+            "mistake": "Using VAR_PROTECTED block (underscore variant — equally forbidden)",
+            "code": "FUNCTION_BLOCK FB_Example\nVAR_PROTECTED\n  nValue : INT;\nEND_VAR",
+            "reason": "VAR_PROTECTED is not a valid TwinCAT keyword. Use VAR...END_VAR with protected METHOD/PROPERTY access specifiers instead."
+          }
+        ],
+        "twincat_reference": "TwinCAT 3 OOP: valid VAR section qualifiers are VAR, VAR_INPUT, VAR_OUTPUT, VAR_IN_OUT, VAR_GLOBAL, VAR CONSTANT, VAR RETAIN, VAR PERSISTENT. PROTECTED visibility is an access modifier on METHOD/PROPERTY, not a VAR section."
+      },
+      "extends_visibility": {
+        "explanation": "When a FUNCTION_BLOCK extends a base FUNCTION_BLOCK, derived code must not access base variables directly unless exposed through the base API.",
+        "why_it_matters": "Accessing private base state from derived classes breaks encapsulation and can fail compile depending on TwinCAT visibility rules.",
+        "correct_examples": [
+          {
+            "description": "Derived class uses protected base API",
+            "code": "FUNCTION_BLOCK FB_Derived EXTENDS FB_Base\nMETHOD FB_init : BOOL\nSUPER^.FB_init(...);\nSUPER^.M_Configure(...);"
+          }
+        ],
+        "common_mistakes": [
+          {
+            "mistake": "Derived class writes base private field",
+            "code": "nPrivateBaseCounter := nPrivateBaseCounter + 1;",
+            "reason": "Base private fields are not part of derived API surface"
+          }
+        ],
+        "twincat_reference": "TwinCAT OOP visibility semantics: expose inherited state through protected methods/properties"
+      },
+      "override_marker": {
+        "explanation": "Overriding methods should be explicitly marked with {attribute 'override'} in TwinCAT declarations.",
+        "why_it_matters": "Explicit override markers prevent accidental shadowing and make inheritance contracts deterministic for static validation.",
+        "correct_examples": [
+          {
+            "description": "Canonical override declaration",
+            "code": "{attribute 'override'}\nMETHOD M_Start : BOOL"
+          }
+        ],
+        "common_mistakes": [
+          {
+            "mistake": "Method shadows base without marker",
+            "code": "METHOD M_Start : BOOL",
+            "reason": "Unmarked shadowing can hide intent and produce fragile inheritance behavior"
+          }
+        ],
+        "twincat_reference": "TwinCAT method attributes documentation for override semantics"
+      },
+      "override_signature": {
+        "explanation": "Overridden methods must keep the same return type and ordered parameter signature as the base declaration.",
+        "why_it_matters": "Signature drift in derived methods breaks polymorphism and may fail compile or silently break runtime dispatch assumptions.",
+        "correct_examples": [
+          {
+            "description": "Matching base and derived signatures",
+            "code": "Base: METHOD M_Set : BOOL VAR_INPUT nTarget : INT; END_VAR\nDerived: METHOD M_Set : BOOL VAR_INPUT nTarget : INT; END_VAR"
+          }
+        ],
+        "common_mistakes": [
+          {
+            "mistake": "Type mismatch in override",
+            "code": "Base INT vs Derived DINT",
+            "reason": "Override signatures must be exact-compatible"
+          }
+        ],
+        "twincat_reference": "IEC 61131-3 OOP method override compatibility requirements"
+      },
+      "interface_contract": {
+        "explanation": "A POU implementing an interface must implement all interface methods/properties with matching signatures and accessor mutability.",
+        "why_it_matters": "Missing or mismatched members against .TcIO contracts lead to non-compilable or behaviorally inconsistent component interfaces.",
+        "correct_examples": [
+          {
+            "description": "Interface property getter/setter contract honored",
+            "code": "INTERFACE I_Log PROPERTY P_Level : INT (Get/Set)\nFUNCTION_BLOCK FB_Logger IMPLEMENTS I_Log PROPERTY P_Level : INT (Get/Set)"
+          }
+        ],
+        "common_mistakes": [
+          {
+            "mistake": "Missing property accessor",
+            "code": "Interface has Set accessor, implementation only has Get",
+            "reason": "Accessor contract is part of interface definition and must match"
+          }
+        ],
+        "twincat_reference": "TwinCAT interface implementation contract for methods and properties"
+      },
+      "policy_interface_contract_integrity": {
+        "explanation": "When policy enforcement is strict, abstract base classes that clearly match one or more interface contracts must keep explicit IMPLEMENTS declarations when they serve active derived classes. Abstract methods are valid in the base; concrete descendants can satisfy the unresolved members through inheritance-aware resolution.",
+        "why_it_matters": "Removing IMPLEMENTS from abstract bases can hide contract intent and bypass interface validation workflows while still appearing structurally valid in derived classes. It can also trigger anti-pattern workarounds such as de-abstracting bases or inserting trivial stubs.",
+        "correct_examples": [
+          {
+            "description": "Abstract base keeps explicit interface contract",
+            "code": "FUNCTION_BLOCK ABSTRACT FB_MotorBase IMPLEMENTS I_MotorControl"
+          }
+        ],
+        "common_mistakes": [
+          {
+            "mistake": "Contract weakening by removing IMPLEMENTS",
+            "code": "FUNCTION_BLOCK FB_MotorBase",
+            "reason": "This can bypass interface contract checks in strict OOP workflows when descendants rely on inherited behavior"
+          },
+          {
+            "mistake": "Redundant derived re-declaration as workaround",
+            "code": "FUNCTION_BLOCK FB_Derived EXTENDS FB_MotorBase IMPLEMENTS I_MotorControl",
+            "reason": "If base already declares IMPLEMENTS, re-declaring in derived class is usually redundant and can drift from inherited contract intent"
+          }
+        ],
+        "twincat_reference": "Project policy contract for fail-closed OOP validation in generated/imported TwinCAT XML"
+      },
+      "extends_cycle": {
+        "explanation": "EXTENDS hierarchies must be acyclic. A FUNCTION_BLOCK cannot (directly or indirectly) inherit from itself.",
+        "why_it_matters": "Cyclic inheritance is an invalid OOP graph and leads to compile-time model resolution failure.",
+        "correct_examples": [
+          {
+            "description": "Acyclic inheritance chain",
+            "code": "FB_Advanced EXTENDS FB_Base; FB_Base EXTENDS FB_Core; FB_Core has no EXTENDS"
+          }
+        ],
+        "common_mistakes": [
+          {
+            "mistake": "Circular inheritance",
+            "code": "FB_A EXTENDS FB_B, FB_B EXTENDS FB_A",
+            "reason": "Cycles in base chain are invalid"
+          }
+        ],
+        "twincat_reference": "TwinCAT OOP type system requires an acyclic EXTENDS graph"
+      },
+      "override_super_call": {
+        "explanation": "Certain lifecycle overrides should invoke SUPER^ to preserve required base side effects and invariants.",
+        "why_it_matters": "Skipping base call in lifecycle methods can silently break base state machine transitions, counters, and safety guards.",
+        "correct_examples": [
+          {
+            "description": "Lifecycle override that preserves base behavior",
+            "code": "{attribute 'override'}\nMETHOD M_Start : BOOL\nM_Start := SUPER^.M_Start();"
+          }
+        ],
+        "common_mistakes": [
+          {
+            "mistake": "Override without base invocation",
+            "code": "{attribute 'override'}\nMETHOD M_Stop : BOOL\nM_Stop := TRUE;",
+            "reason": "Base stop logic may be skipped unintentionally"
+          }
+        ],
+        "twincat_reference": "TwinCAT inheritance best-practice: call SUPER^ for lifecycle overrides unless explicitly designed otherwise"
+      },
+      "inheritance_property_contract": {
+        "explanation": "If a derived FUNCTION_BLOCK redeclares a property from its base chain, it must preserve property type and accessor mutability (Get/Set).",
+        "why_it_matters": "Changing property mutability or type in derived classes breaks substitutability and causes compile/API contract inconsistency.",
+        "correct_examples": [
+          {
+            "description": "Derived property keeps base contract",
+            "code": "Base PROPERTY P_Mode : INT with Get/Set; Derived PROPERTY P_Mode : INT with Get/Set"
+          }
+        ],
+        "common_mistakes": [
+          {
+            "mistake": "Derived property weakens accessor contract",
+            "code": "Base has Get/Set, Derived only Get",
+            "reason": "Mutability contract must remain stable across inheritance"
+          }
+        ],
+        "twincat_reference": "TwinCAT OOP contract compatibility for inherited members"
+      },
+      "fb_init_signature": {
+        "explanation": "FB_init in TwinCAT FUNCTION_BLOCKs should keep canonical signature with BOOL return and leading VAR_INPUT parameters bInitRetains and bInCopyCode.",
+        "why_it_matters": "Incorrect FB_init signature can break initialization lifecycle integration and produce non-portable behavior across projects.",
+        "correct_examples": [
+          {
+            "description": "Canonical FB_init signature",
+            "code": "METHOD FB_init : BOOL\nVAR_INPUT\n  bInitRetains : BOOL;\n  bInCopyCode : BOOL;\nEND_VAR"
+          }
+        ],
+        "common_mistakes": [
+          {
+            "mistake": "Missing required init params",
+            "code": "METHOD FB_init : BOOL\nVAR_INPUT\n  nMode : INT;\nEND_VAR",
+            "reason": "bInitRetains and bInCopyCode should be the first required inputs"
+          }
+        ],
+        "twincat_reference": "TwinCAT lifecycle method FB_init signature conventions"
+      },
+      "fb_init_super_call": {
+        "explanation": "When a derived block overrides FB_init and base FB_init exists, it should call SUPER^.FB_init(...) to preserve base initialization.",
+        "why_it_matters": "Skipping base FB_init risks partially initialized base state and hard-to-debug startup behavior.",
+        "correct_examples": [
+          {
+            "description": "Derived FB_init preserving base init",
+            "code": "{attribute 'override'}\nMETHOD FB_init : BOOL\nFB_init := SUPER^.FB_init(bInitRetains := bInitRetains, bInCopyCode := bInCopyCode);"
+          }
+        ],
+        "common_mistakes": [
+          {
+            "mistake": "No base init call in override",
+            "code": "{attribute 'override'}\nMETHOD FB_init : BOOL\nFB_init := TRUE;",
+            "reason": "Base initialization path is bypassed"
+          }
+        ],
+        "twincat_reference": "TwinCAT inheritance lifecycle best-practice for FB_init"
+      },
+      "this_pointer_consistency": {
+        "explanation": "If a method declares a local symbol with the same name as a class member, member writes should use THIS^ to avoid ambiguity.",
+        "why_it_matters": "Name shadowing can silently write local variables instead of class state, causing subtle logic faults.",
+        "correct_examples": [
+          {
+            "description": "Explicit member write with THIS^ under shadowing",
+            "code": "VAR\n  nCount : INT;\nEND_VAR\nTHIS^.nCount := THIS^.nCount + 1;"
+          }
+        ],
+        "common_mistakes": [
+          {
+            "mistake": "Shadowed unqualified assignment",
+            "code": "nCount := nCount + 1;",
+            "reason": "May update local symbol instead of class member"
+          }
+        ],
+        "twincat_reference": "TwinCAT ST pointer/member access conventions for THIS^"
+      },
+      "abstract_contract": {
+        "explanation": "ABSTRACT methods should have declaration-only behavior, and concrete derived classes must implement all inherited abstract methods.",
+        "why_it_matters": "Violating abstract contracts causes inheritance inconsistencies and compile/runtime contract drift in TwinCAT OOP hierarchies.",
+        "correct_examples": [
+          {
+            "description": "Concrete class implements inherited abstract method",
+            "code": "FUNCTION_BLOCK FB_Derived EXTENDS FB_Base\nMETHOD M_Run : BOOL\nM_Run := TRUE;"
+          },
+          {
+            "description": "Abstract class with abstract method declaration-only",
+            "code": "FUNCTION_BLOCK ABSTRACT FB_Base\nMETHOD ABSTRACT M_Run : BOOL"
+          }
+        ],
+        "common_mistakes": [
+          {
+            "mistake": "Abstract method contains executable body",
+            "code": "METHOD ABSTRACT M_Run : BOOL\nM_Run := TRUE;",
+            "reason": "Abstract methods should not define executable implementation"
+          },
+          {
+            "mistake": "Concrete class leaves inherited abstract method unimplemented",
+            "code": "FUNCTION_BLOCK FB_Derived EXTENDS FB_Base",
+            "reason": "Concrete classes must implement all abstract methods from base chain"
+          }
+        ],
+        "twincat_reference": "TwinCAT OOP abstract inheritance contract rules"
+      },
+      "fb_exit_contract": {
+        "explanation": "FB_exit is the TwinCAT destructor method with a canonical signature: METHOD FB_exit : BOOL with VAR_INPUT (bInCopyCode : BOOL). When a FUNCTION_BLOCK uses __NEW() for dynamic allocation, it MUST have an FB_exit method to clean up resources.",
+        "why_it_matters": "Missing or malformed FB_exit prevents proper cleanup of dynamically allocated objects, causing memory leaks in PLC runtime. Memory leaks accumulate across PLC cycles and can crash the runtime or cause unpredictable behavior.",
+        "correct_examples": [
+          {
+            "description": "Canonical FB_exit signature with cleanup",
+            "code": "METHOD FB_exit : BOOL\nVAR_INPUT\n  bInCopyCode : BOOL;\nEND_VAR\n\nIF NOT bInCopyCode THEN\n  IF _pBuffer <> 0 THEN\n    __DELETE(_pBuffer);\n  END_IF;\nEND_IF;\n\nFB_exit := TRUE;"
+          }
+        ],
+        "common_mistakes": [
+          {
+            "mistake": "Wrong return type",
+            "code": "METHOD FB_exit",
+            "reason": "FB_exit MUST return BOOL (always return TRUE for success)"
+          },
+          {
+            "mistake": "Wrong parameter name or type",
+            "code": "METHOD FB_exit : BOOL\nVAR_INPUT\n  nMode : INT;\nEND_VAR",
+            "reason": "FB_exit parameter must be named bInCopyCode and typed as BOOL"
+          },
+          {
+            "mistake": "Missing FB_exit when using __NEW()",
+            "code": "_pMotor := __NEW(FB_Motor);\n// No FB_exit method defined",
+            "reason": "Dynamic allocation REQUIRES cleanup in FB_exit to prevent memory leaks"
+          }
+        ],
+        "twincat_reference": "FB_exit is called by TwinCAT runtime before instance destruction; bInCopyCode=TRUE means online change, FALSE means actual destruction"
+      },
+      "dynamic_creation_attribute": {
+        "explanation": "When a FUNCTION_BLOCK is instantiated dynamically via __NEW(TypeName), the target FB MUST have {attribute 'enable_dynamic_creation'} in its declaration. Without this attribute, __NEW() returns 0 (NULL pointer) silently at runtime.",
+        "why_it_matters": "Missing enable_dynamic_creation attribute causes __NEW() to silently fail without compiler warning or runtime error. The code appears correct but allocation never succeeds, leading to NULL pointer dereferences and crashes.",
+        "correct_examples": [
+          {
+            "description": "FB with dynamic creation attribute",
+            "code": "{attribute 'enable_dynamic_creation'}\nFUNCTION_BLOCK FB_Motor\nVAR\n  _speed : REAL;\nEND_VAR"
+          },
+          {
+            "description": "Using __NEW() with properly attributed target",
+            "code": "VAR\n  pMotor : POINTER TO FB_Motor;\nEND_VAR\n// FB_Motor has enable_dynamic_creation\npMotor := __NEW(FB_Motor);"
+          }
+        ],
+        "common_mistakes": [
+          {
+            "mistake": "Using __NEW() without target attribute",
+            "code": "// FB_Motor lacks attribute\npMotor := __NEW(FB_Motor);\n// pMotor is 0",
+            "reason": "Target FB MUST have enable_dynamic_creation or allocation fails silently"
+          },
+          {
+            "mistake": "Attribute syntax errors",
+            "code": "{enable_dynamic_creation}\nFUNCTION_BLOCK FB_Motor",
+            "reason": "Attribute must be quoted: {attribute 'enable_dynamic_creation'}"
+          }
+        ],
+        "twincat_reference": "TwinCAT 3 runtime requires explicit opt-in for dynamic allocation for safety; compiler does not validate this at build time",
+        "fix_suggestion": "Manually add {attribute 'enable_dynamic_creation'} to the declaration of FUNCTION_BLOCK TypeName. This cannot be auto-fixed because the issue is reported in the allocator file, but the fix must be applied to the target FB file."
+      },
+      "pointer_delete_pairing": {
+        "explanation": "Every pointer allocated with __NEW(Type) MUST have a matching __DELETE(pointer) in a cleanup method (FB_exit, Dispose, or custom cleanup). Failure to delete causes memory leaks in PLC runtime.",
+        "why_it_matters": "PLC memory is limited and not garbage-collected. Each missed __DELETE() permanently leaks memory. Over thousands of PLC cycles, this accumulates until runtime crashes or stops responding.",
+        "correct_examples": [
+          {
+            "description": "Allocation paired with deletion in FB_exit",
+            "code": "VAR\n  _pBuffer : POINTER TO ARRAY[0..1023] OF BYTE;\nEND_VAR\n\n// Allocation\n_pBuffer := __NEW(ARRAY[0..1023] OF BYTE);\n\n// Cleanup in FB_exit\nMETHOD FB_exit : BOOL\nVAR_INPUT\n  bInCopyCode : BOOL;\nEND_VAR\nIF NOT bInCopyCode THEN\n  __DELETE(_pBuffer);\nEND_IF;\nFB_exit := TRUE;"
+          },
+          {
+            "description": "Custom Dispose pattern",
+            "code": "METHOD Dispose\nIF _pData <> 0 THEN\n  __DELETE(_pData);\n  _pData := 0;\nEND_IF"
+          }
+        ],
+        "common_mistakes": [
+          {
+            "mistake": "Allocation without deletion",
+            "code": "_pBuffer := __NEW(ST_LargeData);\n// Never deleted - memory leak!",
+            "reason": "Every __NEW() MUST have __DELETE() in cleanup path"
+          },
+          {
+            "mistake": "Deleting wrong pointer",
+            "code": "_pA := __NEW(FB_Motor);\n// In FB_exit:\n__DELETE(_pB); // Wrong pointer!",
+            "reason": "Delete the SAME pointer variable that was allocated"
+          },
+          {
+            "mistake": "Missing NULL check before delete",
+            "code": "__DELETE(_pBuffer); // May crash if already NULL",
+            "reason": "Always check IF pointer <> 0 THEN before __DELETE()"
+          }
+        ],
+        "twincat_reference": "TwinCAT PLC runtime does not have automatic garbage collection; manual memory management is mandatory"
+      },
+      "composition_depth": {
+        "explanation": "Deep inheritance hierarchies (>4 levels) violate SOLID principles, specifically favoring composition over inheritance. Excessive depth increases coupling, makes code harder to understand, and can lead to fragile base class problems.",
+        "why_it_matters": "Deep inheritance chains in PLC code are harder to debug, test, and maintain. When a base class changes, all derived classes are affected. Composition (HAS-A) is more flexible than inheritance (IS-A) for TwinCAT projects.",
+        "correct_examples": [
+          {
+            "description": "Use composition instead of deep inheritance",
+            "code": "FUNCTION_BLOCK FB_Motor\nVAR\n  _logger : FB_Logger;  // Composition\n  _validator : FB_Validator;\nEND_VAR"
+          }
+        ],
+        "common_mistakes": [
+          {
+            "mistake": "Deep inheritance pyramid",
+            "code": "FB_Device -> FB_Motor -> FB_ServoMotor -> FB_PrecisionServo -> FB_HighPrecisionServo",
+            "reason": "5 levels of inheritance makes the hierarchy brittle and hard to maintain"
+          }
+        ],
+        "twincat_reference": "TwinCAT supports deep inheritance but SOLID principles recommend shallow hierarchies"
+      },
+      "interface_segregation": {
+        "explanation": "The Interface Segregation Principle states that clients should not be forced to depend on methods they do not use. Large interfaces (>7 members) violate this by creating fat interfaces that impose unnecessary dependencies.",
+        "why_it_matters": "Large interfaces make implementation classes carry bloat. Changes to one method affect all implementers. Testing becomes harder as mocks must implement all methods. PLC scan time increases with unused method overhead.",
+        "correct_examples": [
+          {
+            "description": "Split large interface into focused interfaces",
+            "code": "INTERFACE I_Readable\nMETHOD Read : BOOL\nEND_INTERFACE\n\nINTERFACE I_Writable\nMETHOD Write : BOOL\nEND_INTERFACE"
+          }
+        ],
+        "common_mistakes": [
+          {
+            "mistake": "Fat interface with mixed responsibilities",
+            "code": "INTERFACE I_Device\nMETHOD Read, Write, Open, Close, Start, Stop, Reset, Configure, Validate, Log\nEND_INTERFACE",
+            "reason": "10 methods force all implementers to provide all functionality, even if only 2 methods are actually needed"
+          }
+        ],
+        "twincat_reference": "TwinCAT supports multiple interface implementation - use several small interfaces instead of one large interface"
+      },
+      "method_visibility_consistency": {
+        "explanation": "Liskov Substitution Principle requires derived classes to be substitutable for base classes. Reducing method visibility (PUBLIC -> PROTECTED -> PRIVATE) breaks this by making derived instances less capable than base instances.",
+        "why_it_matters": "Reducing visibility breaks polymorphism. Code that works with base class references may fail with derived instances. This violates the contract established by the base class and causes runtime errors.",
+        "correct_examples": [
+          {
+            "description": "Maintain or increase visibility",
+            "code": "// Base: METHOD PUBLIC Execute\n// Derived: METHOD PUBLIC Execute  <- OK\n// Derived: METHOD PROTECTED Execute  <- VIOLATION"
+          }
+        ],
+        "common_mistakes": [
+          {
+            "mistake": "Reducing visibility in derived class",
+            "code": "FB_Base: METHOD PUBLIC GetStatus\nFB_Derived: METHOD PRIVATE GetStatus",
+            "reason": "Derived class makes public method private, breaking base class contract"
+          }
+        ],
+        "twincat_reference": "TwinCAT allows visibility reduction but it violates Liskov Substitution Principle and breaks polymorphism"
+      },
+      "diamond_inheritance_warning": {
+        "explanation": "Detects when the same interface is implemented in multiple classes along a single inheritance chain (e.g., both base and derived implement I_Logger). This is usually redundant since derived classes automatically inherit interface contracts. True \"diamond\" patterns require multiple parent paths, which TwinCAT does not support (single EXTENDS only).",
+        "why_it_matters": "Redundant interface implementation adds maintenance burden without benefit. If both base and derived implement the same interface, changes to the interface require updating multiple classes. This check is a heuristic for potential design issues.",
+        "correct_examples": [
+          {
+            "description": "Implement interface only once in hierarchy",
+            "code": "FB_Base IMPLEMENTS I_Logger\nFB_Derived EXTENDS FB_Base  // Inherits I_Logger from base"
+          }
+        ],
+        "common_mistakes": [
+          {
+            "mistake": "Redundant re-implementation in derived class",
+            "code": "FB_Base IMPLEMENTS I_Logger\nFB_Derived EXTENDS FB_Base IMPLEMENTS I_Logger  // Redundant",
+            "reason": "I_Logger is already inherited from FB_Base, no need to re-implement"
+          }
+        ],
+        "twincat_reference": "TwinCAT only supports single inheritance (one EXTENDS), so true diamond patterns (multiple parent paths) cannot occur. This check detects redundant implementation as a proxy."
+      },
+      "abstract_instantiation": {
+        "explanation": "Attempting to instantiate an ABSTRACT function block with __NEW(AbstractFB) causes a runtime crash in TwinCAT. Abstract FBs are incomplete and can only be used as base classes for inheritance. They cannot be instantiated directly.",
+        "why_it_matters": "Runtime crashes are difficult to debug because __NEW() fails silently - it returns 0 (NULL pointer) without any compiler warning or runtime error message. When code tries to use the NULL pointer, the PLC crashes with cryptic 'access violation' errors.",
+        "correct_examples": [
+          {
+            "description": "Instantiate concrete derived class instead",
+            "code": "FUNCTION_BLOCK ABSTRACT FB_BaseMotor\n...\nEND_FUNCTION_BLOCK\n\nFUNCTION_BLOCK FB_ConcreteMotor EXTENDS FB_BaseMotor\n...\nEND_FUNCTION_BLOCK\n\n// Correct: instantiate concrete class\npMotor := __NEW(FB_ConcreteMotor);"
+          },
+          {
+            "description": "Use abstract FB as base type only",
+            "code": "VAR\n  pMotor : POINTER TO FB_BaseMotor;\nEND_VAR\n// Correct: variable type can be abstract, but instantiation must be concrete\npMotor := __NEW(FB_ConcreteMotor);"
+          }
+        ],
+        "common_mistakes": [
+          {
+            "mistake": "Direct instantiation of abstract FB",
+            "code": "FUNCTION_BLOCK ABSTRACT FB_BaseMotor\n...\nEND_FUNCTION_BLOCK\n\npMotor := __NEW(FB_BaseMotor);  // CRASH",
+            "reason": "Abstract FBs cannot be instantiated - they are incomplete base classes only"
+          },
+          {
+            "mistake": "Missing ABSTRACT keyword detection",
+            "code": "// Developer may not realize FB is abstract\npController := __NEW(FB_AbstractController);",
+            "reason": "Check naming conventions - abstract FBs often have 'Abstract' or 'Base' prefix"
+          }
+        ],
+        "twincat_reference": "TwinCAT 3 runtime does not provide compile-time validation for abstract instantiation. The check must be done at static analysis time to prevent runtime crashes.",
+        "fix_suggestion": "Cannot auto-fix - requires architectural decision. Options: 1) Create a concrete derived class and instantiate that, 2) Remove ABSTRACT keyword from target FB if it should be instantiable, 3) Use factory pattern to ensure only concrete instances are created"
+      },
+      "forbidden_abstract_attribute": {
+        "explanation": "TwinCAT 3 does not support {attribute 'abstract'} as a pragma. The compiler rejects files containing this pattern. Abstract behavior is declared using the ABSTRACT keyword directly in the method or class header: METHOD ABSTRACT MethodName or FUNCTION_BLOCK ABSTRACT ClassName.",
+        "why_it_matters": "Using {attribute 'abstract'} produces code that appears syntactically valid in XML but is rejected at compile time with no helpful error message, causing long debugging loops. It is a common LLM hallucination from conflating {attribute 'override'} with abstract semantics.",
+        "correct_examples": [
+          {
+            "description": "Abstract method using keyword syntax",
+            "code": "METHOD ABSTRACT Execute : BOOL"
+          },
+          {
+            "description": "Abstract function block using keyword syntax",
+            "code": "FUNCTION_BLOCK ABSTRACT FB_BaseUnit"
+          }
+        ],
+        "common_mistakes": [
+          {
+            "mistake": "Attribute pragma before METHOD (invalid hallucination pattern)",
+            "code": "{attribute 'abstract'}\nMETHOD Execute : BOOL",
+            "reason": "{attribute 'abstract'} is not a valid TwinCAT attribute and will be rejected by the compiler. Use METHOD ABSTRACT Execute instead."
+          }
+        ],
+        "twincat_reference": "TwinCAT 3 PLC IEC 61131-3 OOP: ABSTRACT keyword (TwinCAT 3.1.4022+)"
+      },
+      "hardcoded_dispatch": {
+        "explanation": "Calling the same method on consecutive hardcoded array indices (arr[1].M_Reset(), arr[2].M_Reset()) is a structural anti-pattern. It is brittle, unscalable, and defeats the polymorphic purpose of interface arrays. The correct pattern is a FOR loop over the array.",
+        "why_it_matters": "When a new unit is added the developer must find and update every hardcoded index call site. With a FOR loop, any number of units is handled automatically. Hardcoded dispatch also prevents compile-time detection of out-of-bounds access.",
+        "correct_examples": [
+          {
+            "description": "Loop-based polymorphic dispatch over interface array",
+            "code": "FOR i := 1 TO nUnitCount DO\n  arrUnits[i].M_Reset();\nEND_FOR"
+          }
+        ],
+        "common_mistakes": [
+          {
+            "mistake": "Per-index dispatch for each array element",
+            "code": "arrUnits[1].M_Reset();\narrUnits[2].M_Reset();\narrUnits[3].M_Reset();",
+            "reason": "Hardcoded indices must be updated manually every time the number of units changes. Use a FOR loop instead."
+          }
+        ],
+        "twincat_reference": "TwinCAT 3 PLC OOP polymorphism: interface arrays and FOR-loop dispatch"
+      },
+      "method_count": {
+        "explanation": "Function blocks with too many methods and properties violate the Single Responsibility Principle. A POU with 15+ members likely has multiple responsibilities that should be separated into focused components.",
+        "why_it_matters": "Large POUs are harder to test, maintain, and extend. They create tight coupling between unrelated behaviors, making changes risky and time-consuming. In TwinCAT, bloated FBs also increase scan cycle time and memory footprint.",
+        "correct_examples": [
+          {
+            "description": "Focused FB with clear single responsibility",
+            "code": "FUNCTION_BLOCK FB_MotorController\nVAR\n  _motor : I_Motor;\nEND_VAR\n\nMETHOD M_Start\nMETHOD M_Stop\nMETHOD M_SetSpeed\nPROPERTY IsRunning\nPROPERTY CurrentSpeed"
+          }
+        ],
+        "common_mistakes": [
+          {
+            "mistake": "God object with 20+ methods",
+            "code": "FUNCTION_BLOCK FB_MachineController\n// 25 methods handling motors, sensors, alarms, HMI, logging...",
+            "reason": "Combines unrelated responsibilities. Split into FB_MotorControl, FB_SensorManager, FB_AlarmHandler, etc."
+          }
+        ],
+        "twincat_reference": "TwinCAT has no built-in limit on methods per POU, but SOLID design principles recommend keeping FBs focused. Default limit: 15 members (configurable via max_methods_per_pou).",
+        "fix_suggestion": "Cannot auto-fix - requires design decision. Extract cohesive groups of methods into separate function blocks. Use composition (HAS-A) to combine them."
+      },
+      "property_accessor_pairing": {
+        "explanation": "Properties with only a getter (read-only) or only a setter (write-only) are suspicious and often indicate incomplete implementation. While read-only properties are common and valid, write-only properties are almost always design errors.",
+        "why_it_matters": "Write-only properties cannot be tested or monitored at runtime. Read-only properties without setters may indicate missing initialization logic. Asymmetric properties often signal incomplete refactoring or copy-paste errors.",
+        "correct_examples": [
+          {
+            "description": "Read-only property with getter only (valid pattern)",
+            "code": "PROPERTY IsRunning : BOOL\nVAR\nEND_VAR\n\nIsRunning := _state = E_State.Running;"
+          },
+          {
+            "description": "Read-write property with both accessors",
+            "code": "PROPERTY Speed : REAL\n// Getter\nGET\nSpeed := _speed;\n// Setter\nSET\n_speed := Speed;"
+          }
+        ],
+        "common_mistakes": [
+          {
+            "mistake": "Write-only property (suspicious)",
+            "code": "PROPERTY SetSpeed : REAL\nSET\n_speed := SetSpeed;",
+            "reason": "Cannot read back the value - impossible to verify or test. Use SET accessor on normal property instead"
+          },
+          {
+            "mistake": "Incomplete property refactoring",
+            "code": "PROPERTY Temperature : REAL\n// Getter exists in base class, setter never added",
+            "reason": "Developer may have intended to add setter but forgot - asymmetric properties often indicate incomplete work"
+          }
+        ],
+        "twincat_reference": "TwinCAT allows asymmetric properties, but write-only properties violate observability principle. Read-only properties are acceptable for calculated/derived values.",
+        "fix_suggestion": "Cannot auto-fix - requires design decision. For write-only properties: 1) Add getter to make property read-write, or 2) Convert to method (M_SetSpeed). For read-only properties: validate this is intentional (calculated property) or add setter if state should be mutable"
+      }
+    },
+    "fixes": {
+      "tabs": {
+        "explanation": "Replaces all tab characters (\\t) with 2 space characters. This ensures compliance with TwinCAT XML formatting requirements.",
+        "algorithm": "Simple string replacement: content.replace('\\t', '  '). Scans entire file and replaces every tab with two spaces.",
+        "risk_assessment": "Safe - no data loss, purely formatting change. Reversible by manual re-tabbing (not recommended).",
+        "before_after": {
+          "before": "<POU>\n\t<Declaration>\n\t\t<Name>FB_Test</Name>",
+          "after": "<POU>\n  <Declaration>\n    <Name>FB_Test</Name>"
+        }
+      },
+      "guid_case": {
+        "explanation": "Converts all GUID hex characters to lowercase. TwinCAT requires lowercase a-f, not uppercase A-F.",
+        "algorithm": "Regex pattern match on GUID format, apply .lower() to matched groups. Preserves braces and dashes.",
+        "risk_assessment": "Safe - GUIDs are case-insensitive in RFC 4122, but TwinCAT requires lowercase.",
+        "before_after": {
+          "before": "<POU Id=\"{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}\">",
+          "after": "<POU Id=\"{a1b2c3d4-e5f6-7890-abcd-ef1234567890}\">"
+        }
+      },
+      "file_ending": {
+        "explanation": "Removes extra content after </TcPlcObject> and ensures file ends with exactly one newline.",
+        "algorithm": "1. Remove ]]> after </TcPlcObject> using regex\n2. Find last </TcPlcObject> position\n3. Truncate file to </TcPlcObject> + single newline",
+        "risk_assessment": "Safe - removes invalid trailing content. Backup recommended if file has unusual structure.",
+        "before_after": {
+          "before": "</TcPlcObject>\n]]>\n\n",
+          "after": "</TcPlcObject>\n"
+        }
+      },
+      "newlines": {
+        "explanation": "Removes trailing newlines from property declarations inside CDATA sections. Property declarations should be on a single line.",
+        "algorithm": "Regex pattern: <Declaration><![CDATA[PROPERTY ...\\n]]></Declaration> → remove \\n before ]]>",
+        "risk_assessment": "Safe - formatting only, no semantic change.",
+        "before_after": {
+          "before": "<Declaration><![CDATA[PROPERTY Speed : INT\n]]></Declaration>",
+          "after": "<Declaration><![CDATA[PROPERTY Speed : INT]]></Declaration>"
+        }
+      },
+      "cdata": {
+        "explanation": "Alias for 'newlines' fix - fixes CDATA formatting by removing trailing newlines.",
+        "algorithm": "Delegates to PropertyNewlinesFix - same implementation.",
+        "risk_assessment": "Safe - formatting only.",
+        "before_after": {
+          "before": "<Declaration><![CDATA[PROPERTY Speed : INT\n]]></Declaration>",
+          "after": "<Declaration><![CDATA[PROPERTY Speed : INT]]></Declaration>"
+        }
+      },
+      "var_blocks": {
+        "explanation": "Adds VAR...END_VAR blocks to property getters that have empty CDATA declarations. Required for ST compilation.",
+        "algorithm": "1. Find all <Get> elements with empty <Declaration><![CDATA[]]></Declaration>\n2. Replace with <Declaration><![CDATA[VAR\\nEND_VAR\\n]]></Declaration>",
+        "risk_assessment": "Safe - adds required boilerplate. Only applies to function blocks (skips FUNCTIONs which cannot have properties).",
+        "before_after": {
+          "before": "<Get Name=\"Get\" Id=\"{guid}\">\n  <Declaration><![CDATA[]]></Declaration>\n</Get>",
+          "after": "<Get Name=\"Get\" Id=\"{guid}\">\n  <Declaration><![CDATA[VAR\nEND_VAR\n]]></Declaration>\n</Get>"
+        }
+      },
+      "excessive_blanks": {
+        "explanation": "Reduces consecutive blank lines to maximum of 2. Improves code density and reduces file size.",
+        "algorithm": "1. Split file into lines\n2. Track consecutive blank lines\n3. Keep first 2 blank lines, discard rest\n4. Rejoin lines",
+        "risk_assessment": "Safe - formatting only, no semantic change.",
+        "before_after": {
+          "before": "</Method>\n\n\n\n\n<Method>",
+          "after": "</Method>\n\n<Method>"
+        }
+      },
+      "indentation": {
+        "explanation": "Fixes indentation to ensure all lines use multiples of 2 spaces. Rounds odd-numbered indentation to nearest multiple of 2.",
+        "algorithm": "1. For each line, count leading spaces\n2. If not multiple of 2, round to (spaces + 1) // 2 * 2\n3. Replace line with corrected indentation",
+        "risk_assessment": "Medium risk - may misalign manually-formatted content. Review changes before committing.",
+        "before_after": {
+          "before": "   <Name>Test</Name>",
+          "after": "    <Name>Test</Name>"
+        }
+      },
+      "lineids": {
+        "explanation": "Generates missing LineIds entries for all methods, properties, and the main POU body. Uses sequential LineId numbering.",
+        "algorithm": "1. Parse XML to find all code sections (POU body, methods, property accessors)\n2. Check which sections are missing LineIds\n3. Generate LineId entries: empty code gets Count=0, N lines gets Count=N-1\n4. Insert before closing </POU> tag\n5. Validate resulting XML",
+        "risk_assessment": "Medium risk - generated LineIds may not match IDE expectations if code was manually edited. Always verify in XAE after applying. Breakpoints may need to be reset.",
+        "before_after": {
+          "before": "<POU Name=\"FB_Test\">\n  <Method Name=\"Execute\" />\n</POU>",
+          "after": "<POU Name=\"FB_Test\">\n  <Method Name=\"Execute\" />\n  <LineIds Name=\"FB_Test\">\n    <LineId Id=\"2\" Count=\"0\" />\n  </LineIds>\n  <LineIds Name=\"FB_Test.Execute\">\n    <LineId Id=\"2\" Count=\"0\" />\n  </LineIds>\n</POU>"
+        }
+      },
+      "override_attribute": {
+        "explanation": "Replaces non-canonical METHOD OVERRIDE keyword syntax with TwinCAT's canonical {attribute 'override'} syntax. Ensures consistent override semantics across all derived methods.",
+        "algorithm": "1. Regex pattern matches METHOD\\s+OVERRIDE\\s+MethodName\\s*:\\s*ReturnType\n2. Replace with {attribute 'override'}\\nMETHOD MethodName : ReturnType\n3. Preserves indentation and return type",
+        "risk_assessment": "Safe - only affects method declaration syntax, not implementation logic. Purely canonical formatting change.",
+        "before_after": {
+          "before": "METHOD OVERRIDE M_Start : BOOL",
+          "after": "{attribute 'override'}\nMETHOD M_Start : BOOL"
+        }
+      }
+    },
+    "concepts": {
+      "guid_rules": {
+        "title": "GUID Format & Uniqueness in TwinCAT",
+        "content": "Every POU, interface, DUT, method, and property in TwinCAT requires a unique GUID (Globally Unique Identifier). GUIDs enable the TwinCAT IDE to track objects across renames and moves. Format: {xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx} where x is 0-9 or a-f (lowercase). TwinCAT uses GUIDs for object linking in the project database. Duplicate or invalid GUIDs cause silent failures during project load or compilation.",
+        "learning_objectives": [
+          "Why GUIDs are critical for TwinCAT project integrity",
+          "How to generate valid RFC 4122 compliant GUIDs",
+          "Consequences of duplicate GUIDs across project files",
+          "How TwinCAT IDE handles GUID conflicts",
+          "Best practices: regenerate GUIDs after copy-paste operations"
+        ]
+      },
+      "lineids_algorithm": {
+        "title": "LineIds Mapping & Code-to-XML Correlation",
+        "content": "LineIds are sequential integer markers that map source code line numbers to Declaration XML elements. They enable the TwinCAT IDE to place breakpoints correctly and correlate compiled code with source. Format: <LineIds Name=\"FB.Method\"><LineId Id=\"N\" Count=\"M\" /></LineIds> where N is the starting line ID and M is the count of subsequent lines. Empty methods use Count=0. The LineId ID typically starts at 2 or 3 (1 is reserved). LineIds must be regenerated after adding/removing methods or properties.",
+        "learning_objectives": [
+          "What LineIds represent in TwinCAT XML",
+          "How the IDE uses LineIds for debugging and breakpoints",
+          "Why LineId count must match method/property count + 1",
+          "How to safely regenerate LineIds using auto-fix",
+          "Risks of incorrect LineIds: misplaced breakpoints and debug confusion"
+        ]
+      },
+      "xml_structure": {
+        "title": "TwinCAT XML Schema & Document Structure",
+        "content": "TwinCAT uses XML 1.0 encoding=utf-8 for all project files. The root element is always <TcPlcObject> with version attributes. POU files contain: <POU> for function blocks/programs, <DUT> for data types, <GVL> for global variable lists, <Itf> for interfaces. Each file has: Declaration (variables), Implementation (code), Methods/Properties (optional), and LineIds (debugging metadata). The XML schema is strictly validated during import.",
+        "learning_objectives": [
+          "Understanding TwinCAT XML file structure",
+          "Difference between .TcPOU, .TcDUT, .TcGVL, .TcIO files",
+          "Required vs optional XML elements",
+          "How TwinCAT XAE parses and validates XML",
+          "Common XML parsing errors and how to debug them"
+        ]
+      },
+      "indentation_rules": {
+        "title": "TwinCAT XML Indentation & Formatting Standards",
+        "content": "TwinCAT XAE enforces 2-space indentation for all XML elements. Tabs are not allowed. Each nested element adds 2 spaces. The IDE auto-formats files on open, so non-conformant files are immediately reformatted, causing version control conflicts. Best practice: configure your editor to use 2 spaces per indent level and disable tab insertion.",
+        "learning_objectives": [
+          "Why TwinCAT requires exactly 2-space indentation",
+          "How to configure VS Code / other editors for TwinCAT",
+          "Impact of incorrect indentation on version control",
+          "TwinCAT XAE auto-formatting behavior",
+          "How to batch-fix indentation across multiple files"
+        ]
+      },
+      "property_syntax": {
+        "title": "TwinCAT Property Syntax & VAR Block Requirements",
+        "content": "Properties in TwinCAT function blocks provide controlled access to internal state. Properties have Get and/or Set accessors. Each accessor MUST have a VAR...END_VAR block in its Declaration, even if empty. This is required for ST compilation. Properties are declared with PROPERTY keyword in the main POU Declaration, then defined separately with <Property> XML elements containing <Get> and <Set> children.",
+        "learning_objectives": [
+          "Why property accessors require VAR blocks",
+          "Syntax for read-only vs read-write properties",
+          "How properties differ from methods in TwinCAT",
+          "Common compilation errors with properties",
+          "When to use properties vs public variables"
+        ]
+      }
+    }
+  }
+}

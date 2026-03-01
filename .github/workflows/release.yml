@@ -1,0 +1,166 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    name: Validate Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Run tests
+        run: |
+          pytest tests/ -v --cov=. --cov-report=term --cov-fail-under=80
+
+      - name: Check formatting
+        run: |
+          black --check --line-length=100 twincat_validator/ server.py tests/
+
+      - name: Lint
+        run: |
+          ruff check twincat_validator/ server.py
+
+      - name: Type check
+        run: |
+          mypy twincat_validator/server.py --ignore-missing-imports
+
+  build:
+    name: Build Distribution
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install build tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install build twine
+
+      - name: Build Python package
+        run: python -m build
+
+      - name: Check Python package
+        run: twine check dist/*
+
+      - name: Verify artifacts exclude tests and fixture data
+        run: |
+          python - <<'PY'
+          import glob
+          import sys
+          import tarfile
+          import zipfile
+
+          banned_parts = ("tests/", "tests\\", "fixtures/", "fixtures\\", "golden/", "golden\\")
+          errors = []
+
+          wheel_files = glob.glob("dist/*.whl")
+          sdist_files = glob.glob("dist/*.tar.gz")
+
+          for whl in wheel_files:
+              with zipfile.ZipFile(whl, "r") as zf:
+                  names = zf.namelist()
+              bad = [n for n in names if any(part in n for part in banned_parts)]
+              if bad:
+                  errors.append(f"{whl} contains banned paths: {bad[:10]}")
+
+          for tgz in sdist_files:
+              with tarfile.open(tgz, "r:gz") as tf:
+                  names = tf.getnames()
+              bad = [n for n in names if any(part in n for part in banned_parts)]
+              if bad:
+                  errors.append(f"{tgz} contains banned paths: {bad[:10]}")
+
+          if errors:
+              print("Artifact content check failed:")
+              for err in errors:
+                  print(f"- {err}")
+              sys.exit(1)
+
+          print("Artifact content check passed: no tests/fixtures/golden paths found.")
+          PY
+
+      - name: Build DXT extension
+        run: python scripts/build_dxt.py
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  publish-pypi:
+    name: Publish to PyPI
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/twincat-validator-mcp
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}
+
+  create-release:
+    name: Create GitHub Release
+    needs: publish-pypi
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Extract changelog
+        id: changelog
+        run: |
+          VERSION=${{ steps.get_version.outputs.VERSION }}
+          awk "/## \[$VERSION\]/,/## \[/" CHANGELOG.md | sed '$d' > release_notes.md
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: release_notes.md
+          files: |
+            dist/*.tar.gz
+            dist/*.whl
+            dist/*.dxt
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

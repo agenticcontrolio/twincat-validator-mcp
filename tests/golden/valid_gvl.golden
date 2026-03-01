@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <GVL Name="GVL_Main" Id="{12345678-abcd-ef01-2345-6789abcdef01}">
+    <Declaration><![CDATA[VAR_GLOBAL
+  bSystemReady : BOOL;
+  nCycleCount : UDINT;
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

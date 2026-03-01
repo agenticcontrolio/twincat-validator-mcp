@@ -1,0 +1,3 @@
+# Force LF line endings for golden files to avoid cross-platform hash churn
+*.golden text eol=lf
+hashes.json text eol=lf

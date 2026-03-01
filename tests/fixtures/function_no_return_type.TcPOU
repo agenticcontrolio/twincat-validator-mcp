@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FUNC_NoReturn" Id="{f1a2b3c4-d5e6-7890-abcd-ef1234567895}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION FUNC_NoReturn
+VAR_INPUT
+  nInput : INT;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[;]]></ST>
+    </Implementation>
+    <LineIds Name="FUNC_NoReturn">
+      <LineId Id="3" Count="0" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

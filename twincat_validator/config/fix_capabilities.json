@@ -1,0 +1,94 @@
+{
+  "fixes": [
+    {
+      "id": "tabs",
+      "name": "Tab Replacement",
+      "description": "Replaces tab characters with 2 spaces",
+      "order": 1,
+      "complexity": "simple",
+      "safe": true,
+      "risk_level": "none"
+    },
+    {
+      "id": "file_ending",
+      "name": "File Ending Fix",
+      "description": "Removes extra ]]> after </TcPlcObject>",
+      "order": 2,
+      "complexity": "simple",
+      "safe": true,
+      "risk_level": "none"
+    },
+    {
+      "id": "newlines",
+      "name": "Property Newline Fix",
+      "description": "Fixes property declaration newlines in CDATA",
+      "order": 3,
+      "complexity": "simple",
+      "safe": true,
+      "risk_level": "none"
+    },
+    {
+      "id": "cdata",
+      "name": "CDATA Format Fix",
+      "description": "Fixes CDATA section formatting",
+      "order": 4,
+      "complexity": "simple",
+      "safe": true,
+      "risk_level": "none"
+    },
+    {
+      "id": "var_blocks",
+      "name": "Property VAR Block Addition",
+      "description": "Adds missing VAR blocks to property getters",
+      "order": 5,
+      "complexity": "medium",
+      "safe": true,
+      "risk_level": "low"
+    },
+    {
+      "id": "excessive_blanks",
+      "name": "Excessive Blank Lines Removal",
+      "description": "Removes excessive consecutive blank lines (reduces to max 2)",
+      "order": 6,
+      "complexity": "simple",
+      "safe": true,
+      "risk_level": "none"
+    },
+    {
+      "id": "indentation",
+      "name": "Indentation Fix",
+      "description": "Fixes indentation to use multiples of 2 spaces",
+      "order": 7,
+      "complexity": "simple",
+      "safe": true,
+      "risk_level": "none"
+    },
+    {
+      "id": "guid_case",
+      "name": "GUID Case Conversion",
+      "description": "Converts all GUIDs to lowercase hex",
+      "order": 8,
+      "complexity": "simple",
+      "safe": true,
+      "risk_level": "none"
+    },
+    {
+      "id": "lineids",
+      "name": "LineIds Generation",
+      "description": "Adds missing LineIds entries (experimental)",
+      "order": 9,
+      "complexity": "complex",
+      "safe": false,
+      "risk_level": "medium"
+    },
+    {
+      "id": "override_attribute",
+      "name": "Override Attribute Syntax Fix",
+      "description": "Replaces METHOD OVERRIDE keyword with canonical {attribute 'override'} syntax",
+      "order": 10,
+      "complexity": "simple",
+      "safe": true,
+      "risk_level": "none"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FUNC_Add" Id="{b1c2d3e4-f5a6-7890-abcd-ef1234567891}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION FUNC_Add : INT
+VAR_INPUT
+  nA : INT;
+  nB : INT;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[FUNC_Add := nA + nB;]]></ST>
+    </Implementation>
+    <LineIds Name="FUNC_Add">
+      <LineId Id="1" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

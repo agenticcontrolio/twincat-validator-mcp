@@ -1,0 +1,10 @@
+{
+  "mixed_case_guids": "e47093677635350bd1e22cdbc659e3cc52622842e385192ae37ea6371f2550e5",
+  "tabs_and_bad_indent": "595a35ef9bb97633e05f7855ea406409422978d8c16fd6c33d31c37dad13698a",
+  "valid_fb": "9f72f32429ad5c3820965f8cdb05bc95e64c1de482e95349ab986b46dbe8ba9a",
+  "valid_function": "4f025a0c58219b1ed2d6de532696707cbb9b78eb8b5e83ad65f2c8068eecf958",
+  "valid_gvl": "667c15aafe0aae26c691b56661c8514dd63b510e29cfdc49dba2acbbd6f5da22",
+  "valid_interface": "f11f3e08d7e3e69c95da37a596be9ed9f26534e0ccdc7dec0179baafdd757f70",
+  "valid_program": "e3f289bddf4dec9c9bc64055d5d26654c0b16ec086cf37c2a4566249a53ca44b",
+  "valid_struct": "25f99d55ff3f20be9f89190839b6673d0a51f163f6e635f3280b284bbb4a04f6"
+}
